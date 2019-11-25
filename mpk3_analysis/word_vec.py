@@ -24,6 +24,7 @@ eng_poi_dict = {"KimKardashian",
          "maddow"}
 
 def load_json(jsonl_fin):
+    ''' Method for loading jsonl files'''
     tweet_json_lines = np.array([])
     with open(jsonl_fin) as fin:
         line = fin.readline()
@@ -34,17 +35,26 @@ def load_json(jsonl_fin):
 
 
 def detect_language(tweet):
+    ''' This detects the language of a string of text
+    and returns a text value associated with that language
+    ex: detec_language('is is obviously English')
+    return : 'en' '''
     detector = fasttext.load_model(model_lang)
     return detector.predict(tweet)[0][0][-2:]
 
 
 def get_model(language):
+    ''' This loads a language model based on the
+    text value returned by detect_language'''
     model_fin = models.get(language)
     model = fasttext.load_model(model_fin)
     return model
 
 
 def get_phrases(list_of_json_tweets):
+    '''This gets the tweet text and poi name
+    for each tweet it is given. It returns a list of tuples
+    [(text, poi_name)]'''
     phrases = np.array([(json_tweet.get('tweet_text'),
                          json_tweet.get('poi_name'))
                         for json_tweet in list_of_json_tweets])
@@ -52,7 +62,14 @@ def get_phrases(list_of_json_tweets):
 
 
 def get_phrase_vectors(phrases, model):
-
+    ''' This converts the list of tweets returned by
+    get_phrases and returns two lists. The indexes of
+    each of the returned lists are important so these 
+    lists should never be shuffled or rearranged
+    return: 
+    phrase_vectors is a list of all the 300-D vectors
+    for each tweet
+    poi_names is a list of the corresponding names'''
     # splitline is there to handle newline characters
     # rstrip does not work for this
     phrase_vectors = np.array(
@@ -64,13 +81,18 @@ def get_phrase_vectors(phrases, model):
 
 
 def create_pca(phrase_vectors):
+    '''This builds a PCA model based on the
+    the phrase_vectors returned by get_phrase_vectors
+    return:
+    PCA model used to convert the 300-D vectors to 2-D'''
     pca = PCA(n_components=2)
     pca.fit(phrase_vectors)
     return pca
 
 
 def pca_all_tweets_2D(pca, phrase_vectors):
-    # Convert 300D vector to 2D
+    ''' Convert 300D vectors to 2D
+    return: List of 2-D vectors'''
     phrase_vec_2D = pca.transform(phrase_vectors)
     # zero mean; unit variance; makes things easier
     standardized_vectors_2D = preprocessing.scale(phrase_vec_2D)
@@ -78,6 +100,10 @@ def pca_all_tweets_2D(pca, phrase_vectors):
 
 
 def build_tweet_graph(phrase_vectors_2D, poi_names):
+    '''This builds the first graph with all the color
+    and overlapped dots. The graph created by this is one
+    of all the tweets and represents how they relate to each other
+    semantically in a two dimensional space'''
     df_base = {'name': poi_names,
                'phrase_x': phrase_vectors_2D[:, 0],
                'phrase_y': phrase_vectors_2D[:, 1]}
@@ -90,6 +116,7 @@ def build_tweet_graph(phrase_vectors_2D, poi_names):
 
 
 def build_poi_graph(phrase_vectors_2D, poi_names):
+    '''Creates the graph with the POI names'''
     df_base = {'name': poi_names,
                'phrase_x': phrase_vectors_2D[:, 0],
                'phrase_y': phrase_vectors_2D[:, 1]}
@@ -109,8 +136,10 @@ def build_poi_graph(phrase_vectors_2D, poi_names):
     plt.show()
 
 
-
 def build_and_graph(tweets):
+    '''This is a utility function for creating the PCA model
+    and the graphs. This requires a global variable 'mod' in order to work
+    mod is a loaded language model from fasttext'''
     phrases = get_phrases(tweets)
     phrase_vec, poi_names = get_phrase_vectors(phrases, mod)
     pca = create_pca(phrase_vec)
@@ -127,9 +156,10 @@ def build_and_graph(tweets):
 # Loading a model takes about 1.5 mins
 # This should not be done everytime a query is posed
 # It should be set up so this and the PCA models are already loaded
-x = detect_language('This is english you dumbass')
-mod = get_model(x)
-tweets = load_json(trial)
+
+x = detect_language('This is english you dumbass')  # returns 'en'
+mod = get_model(x)  # needs bin model from fasttext
+tweets = load_json(trial)  # Trial should be changed to where your tweets are
 
 # This is the only thing needed to be done by anyone trying to test this out
 # besides loading the appropriate models
@@ -142,11 +172,3 @@ en = tweets[np.array([tweet.get('poi_name')
 # This does everything including building the PCA models that are
 # used. I will change this
 build_and_graph(en)
-
-
-
-
-
-
-
-
