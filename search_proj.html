@@ -75,9 +75,9 @@
         </li>
       </ul><br>
       <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search Blog..">
+        <input type="text" class="form-control" id="mini_qry" placeholder="Search Blog..">
         <span class="input-group-btn">
-          <button class="btn btn-default" type="button">
+          <button class="btn btn-default" id="submit_mini_qry" type="button">
             <span class="glyphicon glyphicon-search"></span>
           </button>
         </span>
@@ -207,7 +207,7 @@
 
 
 
-    function buildQuery(){
+    function buildQuery(flag){
       jsonData = {"query":"",
                       "country":[],
                       "lang":[],
@@ -216,7 +216,11 @@
                       "tweetDateFrom":"",
                      "tweetDateTo":"",
                       "exactMatch":"true"};
-      qry = document.getElementById("master_qry").value;
+      if(flag){
+        qry = document.getElementById("master_qry").value;
+      }else{
+        qry = document.getElementById("mini_qry").value;
+      }
       countries = [];
       language = [];
       topics = [];
@@ -270,8 +274,13 @@
           .then(res => console.log(res));
     }
     document.getElementById("submit_qry").addEventListener("click", function() {
-      buildQuery();
+      buildQuery(true);
       submitPostReq();
       });
+
+      document.getElementById("submit_mini_qry").addEventListener("click", function() {
+        buildQuery(false);
+        submitPostReq();
+        });
 </script>
 </html>
