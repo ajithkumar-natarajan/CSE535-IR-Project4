@@ -19,8 +19,9 @@ If you want to tinker with any of this on your own you need to change the locati
 
 The pictures are a rough sketch of what some of this would look like. One is picture of all of the english tweets. This stuff is interesting because it shows you how different POIs are tweeting about similar things and how some are tweeting about things a bit different. The space between dots essentially is how close together the information is in the tweets. It has a lot of overlap so I need to fix it so things are clearer. The second picture is created by taking the average of each pois phrases (the average of the pois phrases 2-d representation) and plotting it. I eventually will have it set up so that when a query is posed the query will show up in a red dot on a graph and maybe some kind of labeling showing which POI it is closest to. I will do the exact same thing for topics as well so users can see what topics there queries relate to the best.
 
+
 More to come. I just again have to work tonight. I was given a pseudo-raise/higher level position so my responsibility has kindve gone up significantly. If you have questions send me an email or message on slack. I will try to respond ASAP
 
-
+###### If you want to try to run though code you need to change the file locations at the top of the file and run the driver code at the bottom. 
 
 Mitch
