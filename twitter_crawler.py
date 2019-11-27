@@ -7,7 +7,7 @@ import numpy as np
 NUM_POI_TWEETS = 3000
 NUM_REPLY_TWEETS = 3000
 testusers = ['KimKardashian']
-# Users , india, usa and brazil all need to be edited
+
 users = ["KimKardashian",
          "katyperry",
          "joerogan",
@@ -43,10 +43,10 @@ brazil = {"marcofeliciano",
           "PastorMalafaia"}
 
 debug = False
-oauth_consumer_key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXX'
-oauth_consumer_secret = 'XXXXXXXXXXXXXXXXXXXXX'
-oauth_access_token = 'XXXXXXXXXXXXXXXXXXXX'
-oauth_access_token_secret = 'XXXXXXXXXXXXX'
+oauth_consumer_key = 'VBRRhBySEWjQsY9z011uV77qC'
+oauth_consumer_secret = 'NbZhV5RDkS8G76u8K78hnHg3tzKrpncU2AMAXF0PurTif1tVbq'
+oauth_access_token = '1040711369962729472-4zBRVprDqkEP478Qw3ih8ga5iZbgEy'
+oauth_access_token_secret = 'MhcSjjACqQhU8BhJcsNiJzBnptkwvCfuY1AixepRZNOeu'
 
 auth = tw.OAuthHandler(oauth_consumer_key, oauth_consumer_secret)
 auth.set_access_token(oauth_access_token, oauth_access_token_secret)
@@ -108,7 +108,7 @@ poi_id_numbers ={}
 statuses = []
 for name in users:
     loc = loc_check(name)
-
+    print('Statuses ' + name + ' ' + str(datetime.datetime.now()))
     for status in limiter(tw.Cursor(api.user_timeline, screen_name=name)
                           .items(NUM_POI_TWEETS)):
         poi_id_numbers[name] = status.user.id_str
@@ -203,7 +203,7 @@ for user_set in split:
                                 'verified': status.user.verified,
                                 'country': loc_check(username)})
 
-out_jsonl(statuses, 'poi_replies')
+out_jsonl(replies, 'poi_replies')
 print('Poi tweets complete')
 #n = np.split(np.array(statuses), 15)
 #o = [(y[0].get('poi_id'), y[0].get('poi_name')) for y in n]
