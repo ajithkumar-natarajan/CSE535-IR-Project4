@@ -9,32 +9,35 @@ import os
 import json
 import urllib.request 
 from flask import Flask, request
+# from flask import Flask
+app = Flask(__name__)
 
 
-#@app.route('/search', methods = ['GET','POST'])
+@app.route('/search', methods = ['GET','POST'])
 def returnJsonResult():
-    #if request.method =='POST':
-        #data = request.data
-        #decodeddata = data.decode('utf-8')
-        #jsondata =json.loads(decodeddata)
+    if request.method =='POST':
+        data = request.data
+        decodeddata = data.decode('utf-8')
+        jsondata =json.loads(decodeddata)
+        print(jsondata)
         
         
-#         jsondata = {"query":"", 
-#                     "country":[], 
-#                     "lang":[], 
-#                     "verified":"true",
-#                     "topic":[],
-#                     "tweetDateFrom":"",
-#                     "tweetDateTo":"",
-#                     "exactMatch":"true"}
-        jsondata = {"query":"modi", 
-                    "country":["india","usa"], 
-                    "lang":["en","hi"], 
-                    "verified":"false",
-                    "topic":[],
-                    "tweetDateTo":"2019-09-08T00:00:00Z",
-                    "tweetDateFrom":"2019-09-07T00:00:00Z",
-                    "exactMatch":"false"}
+        # jsondata = {"query":"Lula", 
+        #             "country":[], 
+        #             "lang":[], 
+        #             "verified":"",
+        #             "topic":[],
+        #             "tweetDateFrom":"",
+        #             "tweetDateTo":"",
+        #             "exactMatch":"true"}
+        # jsondata = {"query":"modi", 
+        #             "country":["india","usa"], 
+        #             "lang":["en","hi"], 
+        #             "verified":"false",
+        #             "topic":[],
+        #             "tweetDateTo":"2019-08-08T00:00:00Z",
+        #             "tweetDateFrom":"2019-09-07T00:00:00Z",
+        #             "exactMatch":"false"}
         #temp = c.get('') #frontend ID
         eachquery =  jsondata.get('query')
         #print(eachquery)
@@ -45,7 +48,9 @@ def returnJsonResult():
         #print(eachquery)
         inputQuery = eachquery
         ip = "18.217.246.4:8984"
+        ip = "13.59.238.116:8983"
         IRModel = "IRF19P1"
+        # IRModel = "IRF19"
 
         #country = ["india","usa"]
         country = jsondata.get('country')
@@ -176,7 +181,8 @@ def returnJsonResult():
         docs = json.load(data)['response']['docs']
         #print(docs)
         print("leng",len(docs))
-        #return json.dumps(docs)
+        print(docs)
+        return json.dumps(docs)
     #print(docs[0])
     #print()
     #print(docs[1])
@@ -184,13 +190,20 @@ def returnJsonResult():
 
 
 
-def main():
-    returnJsonResult()
+# def main():
+#     returnJsonResult()
 
-if __name__ == "__main__":
-     main()
+# if __name__ == "__main__":
+#      main()
         
 #http://ec2-18-219-82-180.us-east-2.compute.amazonaws.com:8984/solr/IRF19P1/select?fq=country%3Aindia%20OR%20usa&fq=verified%3Atrue&q=*%3A*
 
 
 
+
+
+# @app.route("/")
+
+
+if __name__ == "__main__":
+    app.run()
