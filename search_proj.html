@@ -56,7 +56,7 @@
           <ul>
             <li><input type="checkbox" id="eng"> English</li>
             <li><input type="checkbox" id="por"> Portuguese</li>
-            <li><input type="checkbox" id="hin"> Hindi</li>
+            <li><input type="checkbox" id="hi"> Hindi</li>
           </ul>
         </li>
         <li class="active"><a>Search by Topic</a>
@@ -74,14 +74,14 @@
           </ul>
         </li>
       </ul><br>
-      <div class="input-group">
+      <!-- <div class="input-group">
         <input type="text" class="form-control" id="mini_qry" placeholder="Search tweets..">
         <span class="input-group-btn">
           <button class="btn btn-default" id="submit_mini_qry" type="button">
             <span class="glyphicon glyphicon-search"></span>
           </button>
         </span>
-      </div>
+      </div> -->
     </div>
 
     <div class="col-sm-10">
@@ -211,7 +211,7 @@
       jsonData = {"query":"",
                       "country":[],
                       "lang":[],
-                      "verified":"true",
+                      "verified":"",
                       "topic":[],
                       "tweetDateFrom":"",
                      "tweetDateTo":"",
@@ -256,7 +256,8 @@
     }
 
     function submitPostReq(){
-      const url = 'https://reqres.in/api/users';
+      // const url = 'https://reqres.in/api/users';
+      const url = 'http://127.0.0.1:5000/search';
 
 
       // request options
@@ -265,12 +266,13 @@
           body: JSON.stringify(jsonData),
           headers: {
               'Content-Type': 'application/json'
-          }
+          },
+          mode: 'no-cors'
       }
 
       // send POST request
       fetch(url, options)
-          .then(res => res.json())
+          // .then(res => res.json())
           .then(res => console.log(res));
     }
     document.getElementById("submit_qry").addEventListener("click", function() {
@@ -278,9 +280,9 @@
       submitPostReq();
       });
 
-      document.getElementById("submit_mini_qry").addEventListener("click", function() {
-        buildQuery(false);
-        submitPostReq();
-        });
+      // document.getElementById("submit_mini_qry").addEventListener("click", function() {
+      //   buildQuery(false);
+      //   submitPostReq();
+      //   });
 </script>
 </html>
