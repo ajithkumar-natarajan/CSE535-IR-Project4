@@ -43,10 +43,10 @@ brazil = {"marcofeliciano",
           "PastorMalafaia"}
 
 debug = False
-oauth_consumer_key = 'VBRRhBySEWjQsY9z011uV77qC'
-oauth_consumer_secret = 'NbZhV5RDkS8G76u8K78hnHg3tzKrpncU2AMAXF0PurTif1tVbq'
-oauth_access_token = '1040711369962729472-4zBRVprDqkEP478Qw3ih8ga5iZbgEy'
-oauth_access_token_secret = 'MhcSjjACqQhU8BhJcsNiJzBnptkwvCfuY1AixepRZNOeu'
+oauth_consumer_key = 'XXXXX'
+oauth_consumer_secret = 'XXXXX'
+oauth_access_token = 'XXXXX'
+oauth_access_token_secret = 'XXXXX'
 
 auth = tw.OAuthHandler(oauth_consumer_key, oauth_consumer_secret)
 auth.set_access_token(oauth_access_token, oauth_access_token_secret)
