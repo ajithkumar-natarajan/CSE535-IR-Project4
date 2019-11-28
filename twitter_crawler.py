@@ -165,8 +165,15 @@ def reply_id_check(tweet):
         return False
 
 
+# A little more fault proof
+split = {}
+for x, y in id_names:
+    if x in split:
+        split[x].append((x, y))
+    else:
+        split[x] = [(x, y)]
 # Driver for response tweets
-split = np.split(np.array(id_names), 15)
+
 AXIS_NUM = 2999
 replies = []
 for user_set in split:
