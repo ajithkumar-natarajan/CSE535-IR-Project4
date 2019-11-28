@@ -43,10 +43,10 @@ brazil = {"marcofeliciano",
           "PastorMalafaia"}
 
 debug = False
-oauth_consumer_key = 'XXXXX'
-oauth_consumer_secret = 'XXXXX'
-oauth_access_token = 'XXXXX'
-oauth_access_token_secret = 'XXXXX'
+oauth_consumer_key = 'VBRRhBySEWjQsY9z011uV77qC'
+oauth_consumer_secret = 'NbZhV5RDkS8G76u8K78hnHg3tzKrpncU2AMAXF0PurTif1tVbq'
+oauth_access_token = '1040711369962729472-4zBRVprDqkEP478Qw3ih8ga5iZbgEy'
+oauth_access_token_secret = 'MhcSjjACqQhU8BhJcsNiJzBnptkwvCfuY1AixepRZNOeu'
 
 auth = tw.OAuthHandler(oauth_consumer_key, oauth_consumer_secret)
 auth.set_access_token(oauth_access_token, oauth_access_token_secret)
@@ -165,7 +165,6 @@ def reply_id_check(tweet):
         return False
 
 
-# A little more fault proof
 split = {}
 for x, y in id_names:
     if x in split:
@@ -176,12 +175,12 @@ for x, y in id_names:
 
 AXIS_NUM = 2999
 replies = []
-for user_set in split:
-    username = user_set[AXIS_NUM][0]
+for user_set in split.keys():
+    username = user_set
     print('Replies ' + username + ' ' + str(datetime.datetime.now()))
     q_string = 'to%3A' + username
-    lowest_id = user_set[AXIS_NUM][1]
-    id_set = set(user_set[:, 1])
+    lowest_id = int(split[username][-1][1])
+    id_set = set([int(i[1]) for i in split[username]])
     for status in limiter(
             tw.Cursor(api.search, q=q_string,
                       since_id=lowest_id, tweet_mode='extended').items(NUM_REPLY_TWEETS)):
