@@ -5,7 +5,7 @@ This file uses LDA to find topics for each country. The topics have numerical la
 ### To create the models:
 - This only needs to be done once with all of the poi tweets
 
->? run ta.py --create 'poi_tweets.jsonl'
+>? run ta.py --create 'sample\_poi_tweets.jsonl'
 >USA : Complete
 >India : Complete
 >Brazil : Complete
