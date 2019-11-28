@@ -24,9 +24,8 @@ I didnt want to create two separate fo
 NUM_OF_TOPICS = 5
 LANG_DETECT_MODEL = '/home/mpk3/Desktop/IR_Final/analytics/ft/models/lid.176.ftz'
 # print(str(sys.argv[1]))
-flag = sys.argv[1] # --create or --label
+flag = sys.argv[1]  # --create or --label
 option = sys.argv[2]
-
 
 
 def load_json(jsonl_fin):
@@ -41,7 +40,8 @@ def load_json(jsonl_fin):
 
 
 def detect_language(tweet):
-    ''' This detects the language of a string of text
+    ''' This is currently not used!!!!!
+    This detects the language of a string of text
     and returns a text value associated with that language
     ex: detec_language('is is obviously English')
     return : 'en' '''
@@ -152,19 +152,8 @@ if flag in ('--create', '-c'):
 if flag in ('--label', '-l'):
     print(label_tweet(option))
 
-
 # Test
-#option = ('poi_tweets.jsonl')
-#create_models(option)
-#option = ('the president is dumb')
-#print(str(label_tweet(option)))
-# This is straight out of Scikit learns tutorial
-# It will not be used in our project but I am using it
-# To inspect things
-
-#def print_top_words(model, feature_names, n_top_words):
-#    for topic_idx, topic in enumerate(model.components_):
-#        message = "Topic #%d: " % topic_idx
-#        message += " ".join([feature_names[i]
-#                             for i in topic.argsort()[:-n_top_words - 1:-1]])
-#        print(message)
+# option = ('poi_tweets.jsonl')
+# create_models(option)
+# option = ('the president is dumb')
+# print(str(label_tweet(option)))
