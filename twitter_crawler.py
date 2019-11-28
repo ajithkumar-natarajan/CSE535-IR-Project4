@@ -6,11 +6,11 @@ import numpy as np
 
 NUM_POI_TWEETS = 3000
 NUM_REPLY_TWEETS = 3000
-testusers = ['KimKardashian']
 
-users = ["KimKardashian",
-         "katyperry",
-         "joerogan",
+
+users = ["mikeallen",
+         "seanhannity",
+         "daveweigel",
          "jaketapper",
          "maddow",
          "BDUTT",
@@ -30,9 +30,9 @@ india = {"BDUTT",
          "narendramodi",
          "vikramchandra"}
 
-usa = {"KimKardashian",
-       "katyperry",
-       "joerogan",
+usa = {"mikeallen",
+       "seanhannity",
+       "daveweigel",
        "jaketapper",
        "maddow"}
 
@@ -103,16 +103,17 @@ def gmt_round_hour(date):
         dt = dt.replace(second=0)
     return dt.isoformat()
 
+
 # Driver
-poi_id_numbers ={}
+poi_id_numbers = {}
 statuses = []
 for name in users:
     loc = loc_check(name)
     print('Statuses ' + name + ' ' + str(datetime.datetime.now()))
-    for status in limiter(tw.Cursor(api.user_timeline, screen_name=name)
+    for status in limiter(tw.Cursor(api.user_timeline, screen_name=name, tweet_mode="extended")
                           .items(NUM_POI_TWEETS)):
         poi_id_numbers[name] = status.user.id_str
-        statuses.append({'tweet_text': status.text,
+        statuses.append({'tweet_text': status.full_text,
                          'id_str': status.id_str,
                          'replied_to_tweet_id': None,
                          'replied_to_user_id': None,
@@ -169,23 +170,23 @@ split = np.split(np.array(id_names), 15)
 AXIS_NUM = 2999
 replies = []
 for user_set in split:
-    username = user_set[2999][0]
+    username = user_set[AXIS_NUM][0]
     print('Replies ' + username + ' ' + str(datetime.datetime.now()))
     q_string = 'to%3A' + username
     lowest_id = user_set[AXIS_NUM][1]
     id_set = set(user_set[:, 1])
     for status in limiter(
             tw.Cursor(api.search, q=q_string,
-                      since_id=lowest_id).items(NUM_REPLY_TWEETS)):
+                      since_id=lowest_id, tweet_mode='extended').items(NUM_REPLY_TWEETS)):
         if status.in_reply_to_status_id is not None:
             if status.in_reply_to_status_id_str in id_set:
-                replies.append({'tweet_text': status.text,
+                replies.append({'tweet_text': status.full_text,
                                 'id_str': status.id_str,
                                 'replied_to_tweet_id':
                                 status.in_reply_to_status_id_str,
                                 'replied_to_user_id':
                                 status.in_reply_to_user_id_str,
-                                'reply_text': status.text,
+                                'reply_text': status.full_text,
                                 'tweet_lang': status.lang,
                                 'hashtags': status.entities.get('hashtags'),
                                 'mentions': [mention.get('screen_name')
