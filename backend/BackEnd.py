@@ -16,10 +16,11 @@ app = Flask(__name__)
 @app.route('/search', methods = ['GET','POST'])
 def returnJsonResult():
     if request.method =='POST':
+        # print("In program1")
         data = request.data
         decodeddata = data.decode('utf-8')
         jsondata =json.loads(decodeddata)
-        print(jsondata)
+        # print(jsondata)
         
         
         # jsondata = {"query":"Lula", 
@@ -125,6 +126,13 @@ def returnJsonResult():
         #tweet_date%3A%5B2019-09-07T00%3A00%3A00Z%20TO%202019-09-08T00%3A00%3A00Z%5D%20
         tweetDateFrom = jsondata.get('tweetDateFrom')
         tweetDateTo =jsondata.get('tweetDateTo')
+        
+        if(tweetDateFrom != ""):
+            tweetDateFrom = tweetDateFrom + "T00:00:00Z"
+        
+        if(tweetDateTo != ""):
+            tweetDateTo = tweetDateTo +"T00:00:00Z"
+        
         if(tweetDateFrom !="" and tweetDateTo !=""):
             a =tweetDateFrom+" TO "+tweetDateTo
 
@@ -180,8 +188,8 @@ def returnJsonResult():
         data = urllib.request.urlopen(inurl)
         docs = json.load(data)['response']['docs']
         #print(docs)
-        print("leng",len(docs))
-        print(docs)
+        print("length:",len(docs))
+        # print(docs)
         return json.dumps(docs)
     #print(docs[0])
     #print()
@@ -206,4 +214,5 @@ def returnJsonResult():
 
 
 if __name__ == "__main__":
+    # print("In program")
     app.run()
