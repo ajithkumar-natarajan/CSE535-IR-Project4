@@ -46,32 +46,54 @@
       <h4>SEARCH TWITTER</h4>
       <ul class="nav nav-pills nav-stacked">
         <li class="active"><a>Search by Country</a>
+          <br>
           <ul>
             <li><input type="checkbox" id ="us"> United States</li>
             <li><input type="checkbox" id ="bra"> Brazil</li>
             <li><input type="checkbox" id ="ind"> India</li>
           </ul>
+          <br>
         </li>
         <li class="active"><a>Search by Language</a>
+          <br>
           <ul>
             <li><input type="checkbox" id="eng"> English</li>
             <li><input type="checkbox" id="por"> Portuguese</li>
             <li><input type="checkbox" id="hi"> Hindi</li>
           </ul>
+          <br>
         </li>
         <li class="active"><a>Search by Topic</a>
+          <br>
           <ul>
             <li><input type="checkbox"> checkbox 1</li>
             <li><input type="checkbox"> checkbox 2</li>
             <li><input type="checkbox"> checkbox 3</li>
             <li><input type="checkbox"> checkbox 4</li>
           </ul>
+          <br>
         </li>
-        <li class="active"><a href="#section1">Home</a>
+        <li class="active"><a href="#section1">Filter by Date</a>
+          <br>
           <ul>
             <li>From date:</br><input type="text" id="datepicker1"></li>
             <li>To date:</br><input type="text" id="datepicker2"></li>
           </ul>
+          <br>
+        </li>
+        <li class="active"><a href="#section1">Number of Results Per Page</a>
+          <br>
+          <ul>
+            <li>
+              <select id="mySelect" onChange="changePagenation(this);">
+                <option>3</option>
+                <option>5</option>
+                <option>10</option>
+                <option>20</option>
+              </select>
+            </li>
+          </ul>
+          <br>
         </li>
       </ul><br>
       <!-- <div class="input-group">
@@ -98,57 +120,10 @@
         </small>
       </h4>
       <hr>
-      <h2>I Love Food</h2>
-      <h5><span class="glyphicon glyphicon-time"></span> Post by Jane Dane, Sep 27, 2015.</h5>
-      <h5><span class="label label-danger">Food</span> <span class="label label-primary">Ipsum</span></h5><br>
-      <p>Food is my passion. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-      <br><br>
-
-      <h4><small>RECENT POSTS</small></h4>
-      <hr>
-      <h2>Officially Blogging</h2>
-      <h5><span class="glyphicon glyphicon-time"></span> Post by John Doe, Sep 24, 2015.</h5>
-      <h5><span class="label label-success">Lorem</span></h5><br>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-      <hr>
-
-      <h4>Leave a Comment:</h4>
-      <form role="form">
-        <div class="form-group">
-          <textarea class="form-control" rows="3" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-success">Submit</button>
-      </form>
-      <br><br>
-
-      <p><span class="badge">2</span> Comments:</p><br>
-
-      <div class="row">
-        <div class="col-sm-2 text-center">
-        </div>
-        <div class="col-sm-10">
-          <h4>Anja <small>Sep 29, 2015, 9:12 PM</small></h4>
-          <p>Keep up the GREAT work! I am cheering for you!! Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-          <br>
-        </div>
-        <div class="col-sm-2 text-center">
-        </div>
-        <div class="col-sm-10">
-          <h4>John Row <small>Sep 25, 2015, 8:25 PM</small></h4>
-          <p>I am so happy for you man! Finally. I am looking forward to read about your trendy life. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-          <br>
-          <p><span class="badge">1</span> Comment:</p><br>
-          <div class="row">
-            <div class="col-sm-2 text-center">
-            </div>
-            <div class="col-xs-10">
-              <h4>Nested Bro <small>Sep 25, 2015, 8:28 PM</small></h4>
-              <p>Me too! WOW!</p>
-              <br>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div id="results"></div>
+      <a href="javascript:prevPage()" id="btn_prev">Prev</a>
+      <a href="javascript:nextPage()" id="btn_next">Next</a>
+      page: <span id="page"></span>
     </div>
   </div>
 </div>
@@ -160,6 +135,7 @@
 </body>
 <script>
 
+    let obj = [];
     var qry = "";
     var countries = [];
     var language = [];
@@ -241,7 +217,7 @@
       if(document.getElementById("por").checked){
         language.push("por");
       }
-      if(document.getElementById("hin").checked){
+      if(document.getElementById("hi").checked){
         language.push("hi");
       }
       to_date = document.getElementById('datepicker2').value;
@@ -255,8 +231,60 @@
 
     }
 
+    function acceptResults(res){
+      objJson = res;
+      const myNode = document.getElementById("results");
+        while (myNode.firstChild) {
+          myNode.removeChild(myNode.firstChild);
+        }
+        if(res.length == 0){
+          document.getElementById("results").appendChild(createElementFromHTML("<h3 style:'color:grey'>No search results found!</h3>"));
+        }else{
+          changePage(1);
+        }
+    }
+
+    function buildResults(res){
+          //debugger;
+
+            var row = createElementFromHTML("<hr>");
+            var h3 = createElementFromHTML("<h3>"+res['_version_']+"</h3>");
+            var dt = createElementFromHTML("<h5><span class='glyphicon glyphicon-time' ></span> Tweet by "+res['poi_name']+", "+res['tweet_date']+".</h5>");
+            document.getElementById("results").appendChild(h3);
+            document.getElementById("results").appendChild(dt);
+            if(typeof res['mentions'] !== 'undefined' && res['mentions'].length > 0){
+              var mentionStr = "<h5>";
+              for (const mention of res['mentions']){
+                mentionStr = mentionStr+ "<span class='label label-danger' style='margin-right:8px'>@"+mention+"</span>";
+              }
+              mentionStr = mentionStr + "</h5>";
+              document.getElementById("results").appendChild(createElementFromHTML(mentionStr));
+            }
+            if(typeof res['hashtags'] !== 'undefined' && res['hashtags'].length > 0){
+              var hashtagStr = "<h5>";
+              for (const hashtag of res['hashtags']){
+                hashtagStr = hashtagStr+ "<span class='label label-primary' style='margin-right:8px'>#"+hashtag+"</span>";
+              }
+              hashtagStr = hashtagStr + "</h5>";
+              document.getElementById("results").appendChild(createElementFromHTML(hashtagStr));
+            }
+
+            document.getElementById("results").appendChild(createElementFromHTML("<p>"+res['tweet_text']+"</p>"));
+            document.getElementById("results").appendChild(row);
+
+
+    }
+
+    function createElementFromHTML(htmlString) {
+        var div = document.createElement('div');
+        div.innerHTML = htmlString.trim();
+
+        // Change this to div.childNodes to support multiple top-level nodes
+        return div.firstChild;
+      }
+
     function submitPostReq(){
-      // const url = 'https://reqres.in/api/users';
+      //const url = 'https://reqres.in/api/users';
       const url = 'http://127.0.0.1:5000/search';
 
 
@@ -267,22 +295,79 @@
           headers: {
               'Content-Type': 'application/json'
           },
-          mode: 'no-cors'
+          //mode: 'no-cors'
       }
 
+      obj = [];
       // send POST request
       fetch(url, options)
-          // .then(res => res.json())
-          .then(res => console.log(res));
+          .then(data => data.json())
+          .then(success => acceptResults(success));
     }
     document.getElementById("submit_qry").addEventListener("click", function() {
       buildQuery(true);
       submitPostReq();
       });
 
-      // document.getElementById("submit_mini_qry").addEventListener("click", function() {
-      //   buildQuery(false);
-      //   submitPostReq();
-      //   });
+    var current_page = 1;
+    var records_per_page = 3;
+
+    function changePagenation(sel) {
+      records_per_page = sel.options[sel.selectedIndex].text
+    }
+
+    var objJson = []; // Can be obtained from another source, such as your objJson variable
+
+    function prevPage()
+    {
+        if (current_page > 1) {
+            current_page--;
+            changePage(current_page);
+        }
+    }
+
+    function nextPage()
+    {
+        if (current_page < numPages()) {
+            current_page++;
+            changePage(current_page);
+        }
+    }
+
+    function changePage(page)
+    {
+        var btn_next = document.getElementById("btn_next");
+        var btn_prev = document.getElementById("btn_prev");
+        var listing_table = document.getElementById("results");
+        var page_span = document.getElementById("page");
+
+        // Validate page
+        if (page < 1) page = 1;
+        if (page > numPages()) page = numPages();
+
+        listing_table.innerHTML = "";
+
+        for (var i = (page-1) * records_per_page; i < (page * records_per_page) && i < objJson.length; i++) {
+            buildResults(objJson[i]);
+        }
+        page_span.innerHTML = page + "/" + numPages();
+
+        if (page == 1) {
+            btn_prev.style.visibility = "hidden";
+        } else {
+            btn_prev.style.visibility = "visible";
+        }
+
+        if (page == numPages()) {
+            btn_next.style.visibility = "hidden";
+        } else {
+            btn_next.style.visibility = "visible";
+        }
+    }
+
+    function numPages()
+    {
+        return Math.ceil(objJson.length / records_per_page);
+    }
 </script>
 </html>
