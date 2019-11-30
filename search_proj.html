@@ -95,7 +95,16 @@
           </ul>
           <br>
         </li>
+        <li class="active"><a href="#section1">Miscellaneous Settings</a>
+          <br>
+          <ul>
+            <li><input type="checkbox" id="verified" checked> Verified</li>
+            <li><input type="checkbox" id="similar"> Display similar results</li>
+          </ul>
+          <br>
+        </li>
       </ul><br>
+
       <!-- <div class="input-group">
         <input type="text" class="form-control" id="mini_qry" placeholder="Search tweets..">
         <span class="input-group-btn">
@@ -142,6 +151,8 @@
     var topics = [];
     var to_date = "";
     var from_date = "";
+    var verified = true;
+    var similar  = false;
     var jsonData =  {"query":"",
                     "country":[],
                     "lang":[],
@@ -220,6 +231,9 @@
       if(document.getElementById("hi").checked){
         language.push("hi");
       }
+
+      to_date = document.getElementById('datepicker2').value;
+      from_date = document.getElementById('datepicker1').value;
       to_date = document.getElementById('datepicker2').value;
       from_date = document.getElementById('datepicker1').value;
       jsonData["query"] = qry;
@@ -228,6 +242,9 @@
       jsonData["topic"] = [];
       jsonData["tweetDateFrom"] = from_date;
       jsonData["tweetDateTo"] = to_date;
+
+      jsonData["verified"] = document.getElementById("verified").checked;
+      jsonData["exactMatch"] = !(document.getElementById("similar").checked);
 
     }
 
@@ -239,6 +256,7 @@
         }
         if(res.length == 0){
           document.getElementById("results").appendChild(createElementFromHTML("<h3 style:'color:grey'>No search results found!</h3>"));
+          resetPagnation();
         }else{
           changePage(1);
         }
@@ -314,6 +332,12 @@
 
     function changePagenation(sel) {
       records_per_page = sel.options[sel.selectedIndex].text
+    }
+
+    function resetPagnation(){
+      document.getElementById("submit_qry").value = "";
+      btn_prev.style.visibility = "visible";
+      btn_next.style.visibility = "visible";
     }
 
     var objJson = []; // Can be obtained from another source, such as your objJson variable
