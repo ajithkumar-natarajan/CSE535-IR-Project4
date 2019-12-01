@@ -143,7 +143,7 @@ for name in users:
                          'verified': status.user.verified,
                          'country': loc})
 
-statuses = load_json('/home/mpk3/Desktop/IR_Final/twitter/poi_tweets.jsonl')
+# statuses = load_json('/home/mpk3/Desktop/IR_Final/twitter/poi_tweets.jsonl')
 id_names = [(ob.get('poi_name'), ob.get('id_str')) for ob in statuses]
 
 
