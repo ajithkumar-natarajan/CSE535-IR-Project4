@@ -43,10 +43,10 @@ brazil = {"marcofeliciano",
           "PastorMalafaia"}
 
 debug = False
-oauth_consumer_key = 'VBRRhBySEWjQsY9z011uV77qC'
-oauth_consumer_secret = 'NbZhV5RDkS8G76u8K78hnHg3tzKrpncU2AMAXF0PurTif1tVbq'
-oauth_access_token = '1040711369962729472-4zBRVprDqkEP478Qw3ih8ga5iZbgEy'
-oauth_access_token_secret = 'MhcSjjACqQhU8BhJcsNiJzBnptkwvCfuY1AixepRZNOeu'
+oauth_consumer_key = 'XXX'
+oauth_consumer_secret = 'XXX'
+oauth_access_token = 'XXXX'
+oauth_access_token_secret = 'XXXX'
 
 auth = tw.OAuthHandler(oauth_consumer_key, oauth_consumer_secret)
 auth.set_access_token(oauth_access_token, oauth_access_token_secret)
@@ -55,6 +55,17 @@ auth.set_access_token(oauth_access_token, oauth_access_token_secret)
 
 api = tw.API(auth)
 # api.update_status('instance check')
+
+
+def load_json(jsonl_fin):
+    ''' Method for loading jsonl files'''
+    tweet_json_lines = np.array([])
+    with open(jsonl_fin) as fin:
+        line = fin.readline()
+        while line:
+            tweet_json_lines = np.append(tweet_json_lines, eval(line))
+            line = fin.readline()
+    return tweet_json_lines
 
 
 def limiter(cursor):
@@ -132,6 +143,7 @@ for name in users:
                          'verified': status.user.verified,
                          'country': loc})
 
+statuses = load_json('/home/mpk3/Desktop/IR_Final/twitter/poi_tweets.jsonl')
 id_names = [(ob.get('poi_name'), ob.get('id_str')) for ob in statuses]
 
 
@@ -164,12 +176,11 @@ def reply_id_check(tweet):
     else:
         return False
 
-
-split = {}
-for x, y in id_names:
-    if x in split:
+split = {} 
+for x, y in id_names: 
+    if x in split: 
         split[x].append((x, y))
-    else:
+    else: 
         split[x] = [(x, y)]
 # Driver for response tweets
 
@@ -180,7 +191,7 @@ for user_set in split.keys():
     print('Replies ' + username + ' ' + str(datetime.datetime.now()))
     q_string = 'to%3A' + username
     lowest_id = int(split[username][-1][1])
-    id_set = set([int(i[1]) for i in split[username]])
+    id_set = set([i[1] for i in split[username]])
     for status in limiter(
             tw.Cursor(api.search, q=q_string,
                       since_id=lowest_id, tweet_mode='extended').items(NUM_REPLY_TWEETS)):
