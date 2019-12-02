@@ -16,3 +16,6 @@ The Topic Bar output is always only one graph.
 The TweetCloud output is as many graphs as there are countries in the results file passed to it.
 ex: If there are tweets from two countries in the results tweets a tweetcloud graph will be produced
 for each country
+
+###
+all_tweets.jsonl is a file of roughly 90k tweets. Most are POI tweets. Only about 4k response tweets. These are the files I used to train my models on.
