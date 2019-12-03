@@ -516,18 +516,18 @@ $(document).keyup(function(event) {
 
 function submitPostReqForNews(){
       //const url = 'https://reqres.in/api/users';
-      const url = 'https://api.jsonbin.io/b/5de6053ab77d632ccda6ac4e';
+      const url = 'http://127.0.0.1:5000/news';
 
 
       // request options
       const options = {
-          method: 'GET', // change to post in final versionßß
-          //body: JSON.stringify(jsonDataForNews), // need body in final
+          method: 'POST', // change to post in final versionßß
+          body: JSON.stringify(jsonDataForNews), // need body in final
           headers: {
               'Content-Type': 'application/json',
-              'secret-key':'$2b$10$nFoRg3IHB27xp54lYEotueIZaQeOpTDIvWFc0mGdnITPOTN4XFqGe' // remove it in final version
+              // 'secret-key':'$2b$10$nFoRg3IHB27xp54lYEotueIZaQeOpTDIvWFc0mGdnITPOTN4XFqGe' // remove it in final version
           },
-          //mode: 'no-cors'
+          // mode: 'no-cors'
       }
 
       obj = [];
