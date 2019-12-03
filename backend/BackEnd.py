@@ -2,6 +2,7 @@ import os
 import json
 import urllib.request 
 from flask import Flask, request
+from google import google
 
 app = Flask(__name__)
 
@@ -173,7 +174,7 @@ def returnJsonResult():
         docs = json.load(data)['response']['docs']
         #print(docs)
         print("length:", len(docs))
-        # print(docs)
+        print(docs)
         return json.dumps(docs)
     #print(docs[0])
     #print()
@@ -196,7 +197,38 @@ def returnJsonResult():
 
 # @app.route("/")
 
+"""
+INSATLL THE MODULE USING THIS COMMAND:
+pip install git+https://github.com/abenassi/Google-Search-API
+"""
+
+@app.route('/news', methods = ['GET','POST'])
+def returnNewsJsonResult():
+    if request.method =='POST':
+        data = request.data
+        decodeddata = data.decode('utf-8')
+        jsondata =json.loads(decodeddata)
+        
+        each_query =  jsondata.get('query')
+        
+        
+        num_page = 1
+        # query = "Modi"
+        search_results = google.search(each_query + "news", num_page)
+        newsList = list()
+        for result in search_results:
+            newsJson = dict()
+            http_loc = result.name.find("http")
+            newsJson['title'] = result.name[0: http_loc]
+            newsJson['desc'] = result.description
+            newsJson['url'] = result.link
+            newsList.append(newsJson)
+
+        print(json.dumps(newsList))
+        return json.dumps(newsList)
+
 
 if __name__ == "__main__":
     # print("In program")
     app.run()
+    # returnNewsJsonResult()
