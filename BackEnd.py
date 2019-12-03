@@ -8,6 +8,10 @@ import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 import plotly.graph_objects as go
+import re 
+import tweepy
+from tweepy import OAuthHandler 
+from textblob import TextBlob
 
 
 
@@ -48,7 +52,7 @@ def returnJsonResult():
         
         input_query = each_query
         
-        ip = "13.59.238.116:8983"
+        ip = "18.217.246.4:8984"
         IRModel = "IRF19P1"
         
         #country = ["india","usa"]
@@ -171,9 +175,9 @@ def returnJsonResult():
         #http://ec2-18-219-82-180.us-east-2.compute.amazonaws.com:8984/solr/IRF19P1/select?fq=tweet_date%3A%5B2019-09-07T00%3A00%3A00Z%20TO%202019-09-08T00%3A00%3A00Z%5D%20AND%20verified%3Atrue&q=*%3A*
         #tweet_date:[2019-09-07T00:00:00Z TO 2019-09-08T00:00:00Z] AND verified:true 
         if(exact_match):
-            inurl = 'http://' + ip + '/solr/' + IRModel + '/select?' + filter_query + '&q='+ input_query #+'&rows=20'
+            inurl = 'http://' + ip + '/solr/' + IRModel + '/select?' + filter_query + '&q='+ input_query +'&rows=1000'
         else:
-            inurl = 'http://' + ip+'/solr/' + IRModel + '/select?defType=edismax&fq=' + filter_query +'&q=' + input_query #+'&rows=20'
+            inurl = 'http://' + ip+'/solr/' + IRModel + '/select?defType=edismax&fq=' + filter_query +'&q=' + input_query +'&rows=1000'
 
 
         print(inurl)
@@ -181,7 +185,16 @@ def returnJsonResult():
         docs = json.load(data)['response']['docs']
         #print(docs)
         print("length:", len(docs))
-        # print(docs)
+
+        sentiment_list = dict()
+        sentiment_list['positive'] = 0
+        sentiment_list['neutral'] = 0
+        sentiment_list['negative'] = 0
+        for tweet_texts in docs:
+            sentiment = sentiment_analyse(tweet_texts['tweet_text'][0])
+            tweet_texts['sentiment'] = sentiment
+            sentiment_list[sentiment] = sentiment_list.get(sentiment)+1
+            # print(tweet_texts)
 
         date_list = list()
         lang_list = list()
@@ -319,6 +332,12 @@ def returnJsonResult():
         # pio.write_html(fig, file='Mentions.html', default_width='370px', default_height='370px')
         pio.write_html(fig, file='Mentions.html')
 
+        fig = go.Figure(data=[go.Pie(labels=list(sentiment_list.keys()), values=list(sentiment_list.values()))])
+        # pio.show(fig)
+        # pio.write_html(fig, file='Language.html', default_width='370px', default_height='370px')
+        fig.update_layout(title="Result of sentiment analysis on the query result")
+        pio.write_html(fig, file='Sentiments.html')
+
         # except:
             # pass
 
@@ -343,6 +362,20 @@ def returnJsonResult():
 
 
 
+def clean_tweet(tweet):
+    
+    return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", tweet).split())
+
+def sentiment_analyse(tweet_text_to_analyse): 
+
+    analysis = TextBlob(clean_tweet(tweet_text_to_analyse)) 
+    
+    if analysis.sentiment.polarity > 0: 
+        return 'positive'
+    elif analysis.sentiment.polarity == 0: 
+        return 'neutral'
+    else: 
+        return 'negative'
 
 
 # @app.route("/")
