@@ -126,10 +126,10 @@ def returnJsonResult():
         tweet_date_to = jsondata.get('tweetDateTo')
         
         if(tweet_date_from != ""):
-            tweetDateFrom = tweetDateFrom + "T00:00:00Z"
+            tweet_date_from = tweet_date_from + "T00:00:00Z"
         
         if(tweet_date_to != ""):
-            tweetDateTo = tweetDateTo + "T00:00:00Z"
+            tweet_date_to = tweet_date_to + "T00:00:00Z"
         
         if(tweet_date_from != "" and tweet_date_to != ""):
             date_filter = tweet_date_from + " TO " + tweet_date_to
@@ -177,7 +177,7 @@ def returnJsonResult():
         if(exact_match):
             inurl = 'http://' + ip + '/solr/' + IRModel + '/select?' + filter_query + '&q='+ input_query +'&rows=1000'
         else:
-            inurl = 'http://' + ip+'/solr/' + IRModel + '/select?defType=edismax&fq=' + filter_query +'&q=' + input_query +'&rows=1000'
+            inurl = 'http://' + ip+'/solr/' + IRModel + '/select?defType=edismax&' + filter_query +'&q=' + input_query +'&rows=1000'
 
 
         print(inurl)
