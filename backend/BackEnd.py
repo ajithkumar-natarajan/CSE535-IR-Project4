@@ -3,6 +3,8 @@ import json
 import urllib.request 
 from flask import Flask, request
 from google import google
+from collections import Counter
+import pandas as pd
 
 app = Flask(__name__)
 
@@ -151,7 +153,7 @@ def returnJsonResult():
             date_filter = date_filter.replace(":","%3A")
             date_filter = date_filter.replace(" ","%20")
             #print(date_filter)
-            date_filter = "tweet_date%3A%5B*%20" + a + "%5D"
+            date_filter = "tweet_date%3A%5B*%20" + date_filter + "%5D"
             #print(date_filter)
             if(filter_query == ""):
                 filter_query = "fq=" + date_filter
@@ -174,7 +176,36 @@ def returnJsonResult():
         docs = json.load(data)['response']['docs']
         #print(docs)
         print("length:", len(docs))
-        print(docs)
+        # print(docs)
+
+        date_list = list()
+        lang_list = list()
+        country_list = list()
+        hashtags_list = list()
+        for i in range(len(docs)):
+            try:
+                # date_time = docs[i].get("tweet_date")[0].find("T")
+                # print(date_time)
+                date_list.append(docs[i].get("tweet_date")[0][0:10])
+                lang_list.append(docs[i].get("tweet_lang")[0])
+                country_list.append(docs[i].get("country")[0])
+                hashtags_list.append(docs[i].get("hashtags")[0])
+            except:
+                pass
+        # print(date_list)
+        date_list = dict(Counter(date_list))
+        lang_list = dict(Counter(lang_list))
+        country_list = dict(Counter(country_list))
+        hashtags_list = dict(Counter(hashtags_list))
+
+        print(date_list)
+        print(lang_list)
+        print(country_list)
+        print(hashtags_list)
+
+        country_data = {'country':['United States', 'India', 'Brazil'], 'Tweets':[country_list.get('USA'), country_list.get('India'), country_list.get('Brazil')], 'country code':['USA', 'IND', 'BRA']}
+        country_df = pd.DataFrame(data)
+
         return json.dumps(docs)
     #print(docs[0])
     #print()
