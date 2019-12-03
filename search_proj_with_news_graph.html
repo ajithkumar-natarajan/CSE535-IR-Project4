@@ -44,40 +44,41 @@
   <div class="row content">
     <div class="col-sm-2 sidenav">
       <h4>SEARCH TWITTER</h4>
+      <h>by TEAM MASS</h5>
       <ul class="nav nav-pills nav-stacked">
         <li class="active"><a>Search by Country</a>
           <br>
           <ul>
-            <li><input type="checkbox" id ="us"> United States</li>
-            <li><input type="checkbox" id ="bra"> Brazil</li>
-            <li><input type="checkbox" id ="ind"> India</li>
+            <li><input type="checkbox" onchange="fireQry()" id ="us"> United States</li>
+            <li><input type="checkbox" onchange="fireQry()" id ="bra"> Brazil</li>
+            <li><input type="checkbox" onchange="fireQry()" id ="ind"> India</li>
           </ul>
           <br>
         </li>
         <li class="active"><a>Search by Language</a>
           <br>
           <ul>
-            <li><input type="checkbox" id="eng"> English</li>
-            <li><input type="checkbox" id="por"> Portuguese</li>
-            <li><input type="checkbox" id="hi"> Hindi</li>
+            <li><input type="checkbox" onchange="fireQry()" id="eng"> English</li>
+            <li><input type="checkbox" onchange="fireQry()" id="por"> Portuguese</li>
+            <li><input type="checkbox" onchange="fireQry()" id="hi"> Hindi</li>
           </ul>
           <br>
         </li>
         <li class="active"><a>Search by Topic</a>
           <br>
           <ul>
-            <li><input type="checkbox"> checkbox 1</li>
-            <li><input type="checkbox"> checkbox 2</li>
-            <li><input type="checkbox"> checkbox 3</li>
-            <li><input type="checkbox"> checkbox 4</li>
+            <li><input type="checkbox"  onchange="fireQry()"> checkbox 1</li>
+            <li><input type="checkbox"  onchange="fireQry()"> checkbox 2</li>
+            <li><input type="checkbox"  onchange="fireQry()"> checkbox 3</li>
+            <li><input type="checkbox"  onchange="fireQry()"> checkbox 4</li>
           </ul>
           <br>
         </li>
         <li class="active"><a href="#section1">Filter by Date</a>
           <br>
           <ul>
-            <li>From date:</br><input type="text" id="datepicker1"></li>
-            <li>To date:</br><input type="text" id="datepicker2"></li>
+            <li>From date:</br><input type="text"  onchange="fireQry()" id="datepicker1"></li>
+            <li>To date:</br><input type="text"  onchange="fireQry()" id="datepicker2"></li>
           </ul>
           <br>
         </li>
@@ -85,7 +86,7 @@
           <br>
           <ul>
             <li>
-              <select id="mySelect" onChange="changePagenation(this);">
+              <select id="mySelect" onChange="changePagenation(this); fireQry()">
                 <option>3</option>
                 <option>5</option>
                 <option>10</option>
@@ -98,8 +99,8 @@
         <li class="active"><a href="#section1">Miscellaneous Settings</a>
           <br>
           <ul>
-            <li><input type="checkbox" id="verified" checked> Verified</li>
-            <li><input type="checkbox" id="similar"> Display similar results</li>
+            <li><input type="checkbox"  onchange="fireQry()" id="verified" checked> Verified</li>
+            <li><input type="checkbox"  onchange="fireQry()" id="similar"> Display similar results</li>
           </ul>
           <br>
         </li>
@@ -131,18 +132,16 @@
       <hr>
 	  <!-- Tab links -->
 <div class="tab">
-  <button class="tablinks" onclick="displayBox('results');clearBox('results1');clearBox('results2')">TweetSearch</button>
-  <button class="tablinks" onclick="clearBox('results');displayBox('results1');clearBox('results2')">News</button>
-  <button class="tablinks" onclick="clearBox('results');clearBox('results1');displayBox('results2');">Analytics</button>
+  <button class="tablinks" id="submit_qry_forTweet">TweetSearch</button>
+  <button class="tablinks" id="submit_qry_forNews">News</button>
+  <button class="tablinks" id="submit_qry_forAnal">Analytics</button>
 </div>
 
 <!-- Tab content -->
 
       <div id="results" ></div>
-	  <div id="results1" style="display:none">
-	  hi</div>
-	  <div id="results2" style="display:none">
-	  bye</div>
+  	  <div id="results1" style="display:none"></div>
+  	  <div id="results2" style="display:none"></div>
       <a href="javascript:prevPage()" id="btn_prev">Prev</a>
       <a href="javascript:nextPage()" id="btn_next">Next</a>
       page: <span id="page"></span>
@@ -150,13 +149,10 @@
   </div>
 </div>
 
-<footer class="container-fluid">
-  <p>Footer Text</p>
-</footer>
-
 </body>
 <script>
 
+    var activeTabNum = '1';
     let obj = [];
     var qry = "";
     var countries = [];
@@ -270,7 +266,7 @@
         qry = document.getElementById("mini_qry").value;
       }
 	  jsonDataForNews["query"] = qry;
-     
+
 
     }
 	function acceptResultsForNews(res)
@@ -333,6 +329,21 @@
 
     }
 
+    function buildResultsForNews(res){
+          //debugger;
+
+            var row = createElementFromHTML("<hr>");
+            var h3 = createElementFromHTML("<h3>"+res['title']+"</h3>");
+            var dt = createElementFromHTML("<a href="+res['url']+"><h5>"+res['url']+"</h5></a>");
+
+            document.getElementById("results1").appendChild(h3);
+            document.getElementById("results1").appendChild(dt);
+            document.getElementById("results1").appendChild(createElementFromHTML("<p>"+res['desc']+"</p>"));
+            document.getElementById("results1").appendChild(row);
+
+
+    }
+
     function createElementFromHTML(htmlString) {
         var div = document.createElement('div');
         div.innerHTML = htmlString.trim();
@@ -362,14 +373,35 @@
           .then(data => data.json())
           .then(success => acceptResults(success));
     }
-    document.getElementById("submit_qry").addEventListener("click", function() {
-      buildQuery(true);
-      submitPostReq();
-      });
+
+  document.getElementById("submit_qry").addEventListener("click", function() {
+    document.getElementById("submit_qry_forTweet").click();
+    });
 	//For News Added by sai
 	document.getElementById("submit_qry_forNews").addEventListener("click", function() {
+      clearBox('results');
+      displayBox('results1');
+      clearBox('results2');
+      activeTab('2');
       buildQueryForNews(true);
       submitPostReqForNews();
+      });
+  document.getElementById("submit_qry_forTweet").addEventListener("click", function() {
+      activeTabNum = "1";
+      buildQuery(true);
+      submitPostReq();
+      displayBox('results');
+      clearBox('results1');
+      clearBox('results2');
+      activeTab('1');
+
+      });
+
+  document.getElementById("submit_qry_forAnal").addEventListener("click", function() {
+      clearBox('results');
+      clearBox('results1');
+      displayBox('results2');
+      activeTab('3');
       });
 	//end of sai
     var current_page = 1;
@@ -407,17 +439,30 @@
     {
         var btn_next = document.getElementById("btn_next");
         var btn_prev = document.getElementById("btn_prev");
-        var listing_table = document.getElementById("results");
         var page_span = document.getElementById("page");
+        if(activeTabNum === '1'){
+          var listing_table = document.getElementById("results");
+        }else if (activeTabNum === '2') {
+          var listing_table = document.getElementById("results1");
+        }
+        else if (activeTabNum === '3') {
+          var listing_table = document.getElementById("results2");
+        }
 
         // Validate page
         if (page < 1) page = 1;
         if (page > numPages()) page = numPages();
 
         listing_table.innerHTML = "";
-
         for (var i = (page-1) * records_per_page; i < (page * records_per_page) && i < objJson.length; i++) {
+          if(activeTabNum === '1'){
             buildResults(objJson[i]);
+          }else if (activeTabNum === '2') {
+            buildResultsForNews(objJson[i]);
+          }
+          else if (activeTabNum === '3') {
+            buildResultsForNews(objJson[i]);
+          }
         }
         page_span.innerHTML = page + "/" + numPages();
 
@@ -438,7 +483,7 @@
     {
         return Math.ceil(objJson.length / records_per_page);
     }
-	
+
 	//Added By sai
 function clearBox(elementID)
 {
@@ -454,17 +499,33 @@ console.log(elementID);
 //element.style.visibility = 'visible';
    document.getElementById(elementID).style.display = "block";
 }
+
+function activeTab(tab){
+  activeTabNum = tab;
+}
+
+function fireQry(){
+  document.getElementById("submit_qry").click();
+}
+
+$(document).keyup(function(event) {
+    if ($(".form-control").is(":focus") && event.key == "Enter") {
+        fireQry();
+    }
+});
+
 function submitPostReqForNews(){
       //const url = 'https://reqres.in/api/users';
-      const url = 'http://127.0.0.1:5000/news';
+      const url = 'https://api.jsonbin.io/b/5de6053ab77d632ccda6ac4e';
 
 
       // request options
       const options = {
-          method: 'POST',
-          body: JSON.stringify(jsonDataForNews),
+          method: 'GET', // change to post in final versionßß
+          //body: JSON.stringify(jsonDataForNews), // need body in final
           headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'secret-key':'$2b$10$nFoRg3IHB27xp54lYEotueIZaQeOpTDIvWFc0mGdnITPOTN4XFqGe' // remove it in final version
           },
           //mode: 'no-cors'
       }
