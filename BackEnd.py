@@ -5,6 +5,11 @@ from flask import Flask, request
 from google import google
 from collections import Counter
 import pandas as pd
+import plotly.express as px
+import plotly.io as pio
+import plotly.graph_objects as go
+
+
 
 app = Flask(__name__)
 
@@ -182,37 +187,151 @@ def returnJsonResult():
         lang_list = list()
         country_list = list()
         hashtags_list = list()
+        mentions_list = list()
+        date_lang_list = dict()
+
         for i in range(len(docs)):
             try:
                 # date_time = docs[i].get("tweet_date")[0].find("T")
                 # print(date_time)
                 date_list.append(docs[i].get("tweet_date")[0][0:10])
-                lang_list.append(docs[i].get("tweet_lang")[0])
+                doc_tweet_lang = docs[i].get("tweet_lang")[0]
+                lang_list.append(doc_tweet_lang)
+                if(doc_tweet_lang in date_lang_list):
+                    date_lang_list[doc_tweet_lang].append(docs[i].get("tweet_date")[0][0:10])
+                else:
+                    date_lang_list[doc_tweet_lang] = list()
+                    date_lang_list[doc_tweet_lang].append(docs[i].get("tweet_date")[0][0:10])
                 country_list.append(docs[i].get("country")[0])
                 hashtags_list.append(docs[i].get("hashtags")[0])
+                mentions_list.append(docs[i].get("mentions")[0])
             except:
                 pass
         # print(date_list)
+        # try:
         date_list = dict(Counter(date_list))
         lang_list = dict(Counter(lang_list))
         country_list = dict(Counter(country_list))
         hashtags_list = dict(Counter(hashtags_list))
+        mentions_list = dict(Counter(mentions_list))
 
-        print(date_list)
-        print(lang_list)
-        print(country_list)
-        print(hashtags_list)
+        for key in date_lang_list:
+            date_lang_list[key] = dict(Counter(date_lang_list[key]))
+
+        # print(date_list)
+        # print(lang_list)
+        # print(country_list)
+        # print(hashtags_list)
+        # print(mentions_list)
+        # print(date_lang_list)
 
         country_data = {'country':['United States', 'India', 'Brazil'], 'Tweets':[country_list.get('USA'), country_list.get('India'), country_list.get('Brazil')], 'country code':['USA', 'IND', 'BRA']}
-        country_df = pd.DataFrame(data)
+        country_df = pd.DataFrame(country_data)
 
-        return json.dumps(docs)
+
+        fig = px.choropleth(country_df, locations="country code",
+                            color="Tweets",
+                            hover_name="country",
+                            color_continuous_scale='Blues')
+        # pio.show(fig)
+        # pio.write_html(fig, file='Location.html', default_width='370px', default_height='370px')
+        fig.update_layout(title="Heatmap of count of tweets from different countries")
+        pio.write_html(fig, file='Location.html')
+
+        fig = go.Figure(data=[go.Pie(labels=list(lang_list.keys()), values=list(lang_list.values()))])
+        # pio.show(fig)
+        # pio.write_html(fig, file='Language.html', default_width='370px', default_height='370px')
+        fig.update_layout(title="Pie chart of count of tweets in different languages")
+        pio.write_html(fig, file='Language.html')
+
+
+        date_list_key_sorted = list()
+        date_list_value_sorted = list()
+        for i in sorted (date_list.keys()):
+            date_list_key_sorted.append(i)
+            date_list_value_sorted.append(date_list.get(i))
+        fig = go.Figure(go.Scatter(x=date_list_key_sorted, y=date_list_value_sorted))
+        fig.update_xaxes(title_text='Dates')
+        fig.update_yaxes(title_text='No of tweets')
+        fig.update_layout(title="Number of tweet on different dates")
+        # pio.show(fig)
+        # pio.write_html(fig, file='TimeSeries.html', default_width='370px', default_height='370px')
+        pio.write_html(fig, file='TimeSeries.html')
+
+        fig = go.Figure()
+        for key in date_lang_list:
+            date_lang_list_key_sorted = list()
+            date_lang_list_value_sorted = list()
+            for i in sorted (date_lang_list[key].keys()):
+                date_lang_list_key_sorted.append(i)
+                date_lang_list_value_sorted.append(date_lang_list[key].get(i))
+
+            fig.add_trace(go.Scatter(
+                    x=date_lang_list_key_sorted,
+                    y=date_lang_list_value_sorted,
+                    name=key,
+                    # line_color='deepskyblue',
+                    opacity=0.8))
+
+            # print(date_lang_list_key_sorted, date_lang_list_value_sorted)
+        fig.update_xaxes(title_text='Dates')
+        fig.update_yaxes(title_text='No of tweets')
+        # fig.update_layout(title={'text':"Number of tweet on different dates", 'xanchor': 'left'})
+        fig.update_layout(title="Number of tweet in different languages on different dates")
+        # pio.write_html(fig, file='TimeSeriesLanguage.html', default_width='370px', default_height='370px')
+        pio.write_html(fig, file='TimeSeriesLanguage.html')
+
+# fig.add_trace(go.Scatter(
+#                 x=date_list_key_sorted_1,
+#                 y=date_list_value_sorted_1,
+#                 name="AAPL Low",
+#                 line_color='dimgray',
+#                 opacity=0.8))
+
+# Use date string to set xaxis range
+# fig.update_layout(xaxis_range=['2016-07-01','2016-12-31'],
+                  # title_text="Manually Set Date Range")
+# fig.show()
+
+        fig = {
+            "data": [{"type": "bar",
+            "x": list(hashtags_list.keys()),
+            "y": list(hashtags_list.values())}],
+            "layout": {"title": {"text": "Number of tweets per hashtag"}}
+            }
+        # fig.update_xaxes(title_text='Hashtags')
+        # fig.update_yaxes(title_text='No of tweets')
+
+        # pio.show(fig)
+        # pio.write_html(fig, file='Hashtags.html', default_width='370px', default_height='370px')
+        pio.write_html(fig, file='Hashtags.html')
+
+        fig = {
+            "data": [{"type": "bar",
+            "x": list(mentions_list.keys()),
+            "y": list(mentions_list.values())}],
+            "layout": {"title": {"text": "Number of tweets per mention"}}
+            }
+        # fig.update_xaxes(title_text='Mention')
+        # fig.update_yaxes(title_text='No of tweets')
+
+        # pio.show(fig)
+        # pio.write_html(fig, file='Mentions.html', default_width='370px', default_height='370px')
+        pio.write_html(fig, file='Mentions.html')
+
+        # except:
+            # pass
+
+#         labels = date_list_key_sorted
+# values = date_list_value_sorted
+
     #print(docs[0])
     #print()
     #print(docs[1])
     #print("leng",len(docs))
 
 
+        return json.dumps(docs)
 
 # def main():
 #     returnJsonResult()
