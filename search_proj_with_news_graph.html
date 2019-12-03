@@ -36,6 +36,29 @@
       }
       .row.content {height: auto;}
     }
+
+    .master_analytics {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .anal_dropdown{
+      width: 20%;
+      left: 40%;
+      top: 21vh;
+      position: absolute;
+      border: 1px solid red;
+   }
+   .graphCont{
+     border: 2px solid blue;
+     width: 720px;
+     position: relative;
+     top: 15vh;
+     display: flex;
+      flex-wrap: wrap;
+    }
   </style>
 </head>
 <body>
@@ -141,10 +164,28 @@
 
       <div id="results" ></div>
   	  <div id="results1" style="display:none"></div>
-  	  <div id="results2" style="display:none"></div>
-      <a href="javascript:prevPage()" id="btn_prev">Prev</a>
-      <a href="javascript:nextPage()" id="btn_next">Next</a>
-      page: <span id="page"></span>
+  	  <div id="results2" style="display:none">
+        <div class ="master_analytics">
+          <select class="anal_dropdown" id="analytics_dropdown" style="float:left" onChange="changeAnalytics(this);">
+            <option>Location</option>
+            <option>Language</option>
+            <option>Time series (by language)</option>
+            <option>Time series</option>
+            <option>Hashtags</option>
+            <option>Mentions</option>
+            <option>Topics</option>
+            <option>Sentiments</option>
+          </select>
+          <div class="graphCont" id="graphContent" style="float:left">
+            <iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Location.html" height="550" width="100%"></iframe>
+          </div>
+        </div>
+      </div>
+      <div id="pagenationCont">
+        <a href="javascript:prevPage()" id="btn_prev">Prev</a>
+        <a href="javascript:nextPage()" id="btn_next">Next</a>
+        page: <span id="page"></span>
+      </div>
     </div>
   </div>
 </div>
@@ -379,6 +420,7 @@
     });
 	//For News Added by sai
 	document.getElementById("submit_qry_forNews").addEventListener("click", function() {
+      displayBox('pagenationCont');
       clearBox('results');
       displayBox('results1');
       clearBox('results2');
@@ -388,6 +430,7 @@
       });
   document.getElementById("submit_qry_forTweet").addEventListener("click", function() {
       activeTabNum = "1";
+      displayBox('pagenationCont');
       buildQuery(true);
       submitPostReq();
       displayBox('results');
@@ -398,11 +441,14 @@
       });
 
   document.getElementById("submit_qry_forAnal").addEventListener("click", function() {
+      clearBox('pagenationCont');
       clearBox('results');
       clearBox('results1');
       displayBox('results2');
       activeTab('3');
       });
+
+
 	//end of sai
     var current_page = 1;
     var records_per_page = 3;
@@ -415,6 +461,28 @@
       document.getElementById("page").value = "";
       btn_prev.style.visibility = "visible";
       btn_next.style.visibility = "visible";
+    }
+
+    function changeAnalytics(sel){
+      document.getElementById("graphContent").innerHTML = "";
+      var newMetric = sel.options[sel.selectedIndex].text;
+      if(newMetric === 'Location'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Location.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Language'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Language.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Time series (by language)'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="TimeSeriesLanguage.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Time series'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="TimeSeries.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Hashtags'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Hashtags.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Mentions'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Mentions.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Topics'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Topics.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Sentiments'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Sentiments.html" height="550" width="100%"></iframe>'));
+      }
     }
 
     var objJson = []; // Can be obtained from another source, such as your objJson variable
@@ -445,9 +513,6 @@
         }else if (activeTabNum === '2') {
           var listing_table = document.getElementById("results1");
         }
-        else if (activeTabNum === '3') {
-          var listing_table = document.getElementById("results2");
-        }
 
         // Validate page
         if (page < 1) page = 1;
@@ -458,9 +523,6 @@
           if(activeTabNum === '1'){
             buildResults(objJson[i]);
           }else if (activeTabNum === '2') {
-            buildResultsForNews(objJson[i]);
-          }
-          else if (activeTabNum === '3') {
             buildResultsForNews(objJson[i]);
           }
         }
