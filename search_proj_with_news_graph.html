@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Bootstrap Example</title>
+  <title>TEAM MASS - Twitter Search Engine</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
@@ -112,7 +112,7 @@
               <select id="mySelect" onChange="changePagenation(this); fireQry()">
                 <option>3</option>
                 <option>5</option>
-                <option>10</option>
+                <option selected="selected">10</option>
                 <option>20</option>
               </select>
             </li>
@@ -365,6 +365,15 @@
             }
 
             document.getElementById("results").appendChild(createElementFromHTML("<p>"+res['tweet_text']+"</p>"));
+
+            if(res['sentiment'] === 'positive'){
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-up-16.png' alt='POSTIVE' height='16' width='16'></h5>"));
+            }else if(res['sentiment'] === 'neutral'){
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='so-so-16.png' alt='NEUTRAL' height='16' width='16'></h5>"));
+            }else if(res['sentiment'] === 'negative'){
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-down-16.png' alt='NEGATIVE' height='16' width='16'></h5>"));
+            }
+
             document.getElementById("results").appendChild(row);
 
 
@@ -451,7 +460,7 @@
 
 	//end of sai
     var current_page = 1;
-    var records_per_page = 3;
+    var records_per_page = 10;
 
     function changePagenation(sel) {
       records_per_page = sel.options[sel.selectedIndex].text
