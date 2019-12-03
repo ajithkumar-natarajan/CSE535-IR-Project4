@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+  <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+
+  <style>
+    /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+    .row.content {height: 1500px}
+
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height: auto;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-2 sidenav">
+      <h4>SEARCH TWITTER</h4>
+      <ul class="nav nav-pills nav-stacked">
+        <li class="active"><a>Search by Country</a>
+          <br>
+          <ul>
+            <li><input type="checkbox" id ="us"> United States</li>
+            <li><input type="checkbox" id ="bra"> Brazil</li>
+            <li><input type="checkbox" id ="ind"> India</li>
+          </ul>
+          <br>
+        </li>
+        <li class="active"><a>Search by Language</a>
+          <br>
+          <ul>
+            <li><input type="checkbox" id="eng"> English</li>
+            <li><input type="checkbox" id="por"> Portuguese</li>
+            <li><input type="checkbox" id="hi"> Hindi</li>
+          </ul>
+          <br>
+        </li>
+        <li class="active"><a>Search by Topic</a>
+          <br>
+          <ul>
+            <li><input type="checkbox"> checkbox 1</li>
+            <li><input type="checkbox"> checkbox 2</li>
+            <li><input type="checkbox"> checkbox 3</li>
+            <li><input type="checkbox"> checkbox 4</li>
+          </ul>
+          <br>
+        </li>
+        <li class="active"><a href="#section1">Filter by Date</a>
+          <br>
+          <ul>
+            <li>From date:</br><input type="text" id="datepicker1"></li>
+            <li>To date:</br><input type="text" id="datepicker2"></li>
+          </ul>
+          <br>
+        </li>
+        <li class="active"><a href="#section1">Number of Results Per Page</a>
+          <br>
+          <ul>
+            <li>
+              <select id="mySelect" onChange="changePagenation(this);">
+                <option>3</option>
+                <option>5</option>
+                <option>10</option>
+                <option>20</option>
+              </select>
+            </li>
+          </ul>
+          <br>
+        </li>
+        <li class="active"><a href="#section1">Miscellaneous Settings</a>
+          <br>
+          <ul>
+            <li><input type="checkbox" id="verified" checked> Verified</li>
+            <li><input type="checkbox" id="similar"> Display similar results</li>
+          </ul>
+          <br>
+        </li>
+      </ul><br>
+
+      <!-- <div class="input-group">
+        <input type="text" class="form-control" id="mini_qry" placeholder="Search tweets..">
+        <span class="input-group-btn">
+          <button class="btn btn-default" id="submit_mini_qry" type="button">
+            <span class="glyphicon glyphicon-search"></span>
+          </button>
+        </span>
+      </div> -->
+    </div>
+
+    <div class="col-sm-10">
+      <h4>
+        <small>
+          <div class="input-group">
+          <input type="text" class="form-control" id="master_qry" placeholder="Search tweets..">
+            <span class="input-group-btn">
+              <button class="btn btn-default" id="submit_qry" type="button">
+                <span class="glyphicon glyphicon-search"></span>
+              </button>
+            </span>
+          </div>
+        </small>
+      </h4>
+      <hr>
+	  <!-- Tab links -->
+<div class="tab">
+  <button class="tablinks" onclick="displayBox('results');clearBox('results1');clearBox('results2')">TweetSearch</button>
+  <button class="tablinks" onclick="clearBox('results');displayBox('results1');clearBox('results2')">News</button>
+  <button class="tablinks" onclick="clearBox('results');clearBox('results1');displayBox('results2');">Analytics</button>
+</div>
+
+<!-- Tab content -->
+
+      <div id="results" ></div>
+	  <div id="results1" style="display:none">
+	  hi</div>
+	  <div id="results2" style="display:none">
+	  bye</div>
+      <a href="javascript:prevPage()" id="btn_prev">Prev</a>
+      <a href="javascript:nextPage()" id="btn_next">Next</a>
+      page: <span id="page"></span>
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid">
+  <p>Footer Text</p>
+</footer>
+
+</body>
+<script>
+
+    let obj = [];
+    var qry = "";
+    var countries = [];
+    var language = [];
+    var topics = [];
+    var to_date = "";
+    var from_date = "";
+    var verified = true;
+    var similar  = false;
+    var jsonData =  {"query":"",
+                    "country":[],
+                    "lang":[],
+                    "verified":"true",
+                    "topic":[],
+                    "tweetDateFrom":"",
+                   "tweetDateTo":"",
+                    "exactMatch":"true"};
+	var jsonDataForNews =  {"query":""};
+
+    var picker1 = new Pikaday({ field: document.getElementById('datepicker1') ,format: 'YYYY-MM-DD',toString(date, format) {
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${year}-${month}-${day}`;
+    },
+    parse(dateString, format) {
+        // dateString is the result of `toString` method
+        const parts = dateString.split('/');
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        return new Date(year, month, day);
+    }});
+    var picker2 = new Pikaday({ field: document.getElementById('datepicker2') ,format: 'YYYY-MM-DD',toString(date, format) {
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${year}-${month}-${day}`;
+    },
+    parse(dateString, format) {
+        // dateString is the result of `toString` method
+        const parts = dateString.split('/');
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        return new Date(year, month, day);
+    }});
+
+
+
+
+    function buildQuery(flag){
+      jsonData = {"query":"",
+                      "country":[],
+                      "lang":[],
+                      "verified":"",
+                      "topic":[],
+                      "tweetDateFrom":"",
+                     "tweetDateTo":"",
+                      "exactMatch":"true"};
+      if(flag){
+        qry = document.getElementById("master_qry").value;
+      }else{
+        qry = document.getElementById("mini_qry").value;
+      }
+      countries = [];
+      language = [];
+      topics = [];
+      to_date = "";
+      from_date = "";
+      if(document.getElementById("us").checked){
+        countries.push("usa");
+      }
+      if(document.getElementById("bra").checked){
+        countries.push("brazil");
+      }
+      if(document.getElementById("ind").checked){
+        countries.push("india");
+      }
+      if(document.getElementById("eng").checked){
+        language.push("eng");
+      }
+      if(document.getElementById("por").checked){
+        language.push("por");
+      }
+      if(document.getElementById("hi").checked){
+        language.push("hi");
+      }
+
+      to_date = document.getElementById('datepicker2').value;
+      from_date = document.getElementById('datepicker1').value;
+      to_date = document.getElementById('datepicker2').value;
+      from_date = document.getElementById('datepicker1').value;
+      jsonData["query"] = qry;
+      jsonData["country"] = countries;
+      jsonData["lang"] = language;
+      jsonData["topic"] = [];
+      jsonData["tweetDateFrom"] = from_date;
+      jsonData["tweetDateTo"] = to_date;
+
+      jsonData["verified"] = document.getElementById("verified").checked;
+      jsonData["exactMatch"] = !(document.getElementById("similar").checked);
+
+    }
+	//Added By SAI
+	function buildQueryForNews(flag){
+      jsonDataForNews = {"query":""};
+      if(flag){
+        qry = document.getElementById("master_qry").value;
+      }else{
+        qry = document.getElementById("mini_qry").value;
+      }
+	  jsonDataForNews["query"] = qry;
+     
+
+    }
+	function acceptResultsForNews(res)
+	{
+	objJson = res;
+      const myNode = document.getElementById("results");
+        while (myNode.firstChild) {
+          myNode.removeChild(myNode.firstChild);
+        }
+        if(res.length == 0){
+          document.getElementById("results").appendChild(createElementFromHTML("<h3 style:'color:grey'>No search results found!</h3>"));
+          resetPagnation();
+        }else{
+          changePage(1);
+        }
+	}
+	//End Of SAI
+    function acceptResults(res){
+      objJson = res;
+      const myNode = document.getElementById("results");
+        while (myNode.firstChild) {
+          myNode.removeChild(myNode.firstChild);
+        }
+        if(res.length == 0){
+          document.getElementById("results").appendChild(createElementFromHTML("<h3 style:'color:grey'>No search results found!</h3>"));
+          resetPagnation();
+        }else{
+          changePage(1);
+        }
+    }
+
+    function buildResults(res){
+          //debugger;
+
+            var row = createElementFromHTML("<hr>");
+            var h3 = createElementFromHTML("<h3>"+res['_version_']+"</h3>");
+            var dt = createElementFromHTML("<h5><span class='glyphicon glyphicon-time' ></span> Tweet by "+res['poi_name']+", "+res['tweet_date']+".</h5>");
+            document.getElementById("results").appendChild(h3);
+            document.getElementById("results").appendChild(dt);
+            if(typeof res['mentions'] !== 'undefined' && res['mentions'].length > 0){
+              var mentionStr = "<h5>";
+              for (const mention of res['mentions']){
+                mentionStr = mentionStr+ "<span class='label label-danger' style='margin-right:8px'>@"+mention+"</span>";
+              }
+              mentionStr = mentionStr + "</h5>";
+              document.getElementById("results").appendChild(createElementFromHTML(mentionStr));
+            }
+            if(typeof res['hashtags'] !== 'undefined' && res['hashtags'].length > 0){
+              var hashtagStr = "<h5>";
+              for (const hashtag of res['hashtags']){
+                hashtagStr = hashtagStr+ "<span class='label label-primary' style='margin-right:8px'>#"+hashtag+"</span>";
+              }
+              hashtagStr = hashtagStr + "</h5>";
+              document.getElementById("results").appendChild(createElementFromHTML(hashtagStr));
+            }
+
+            document.getElementById("results").appendChild(createElementFromHTML("<p>"+res['tweet_text']+"</p>"));
+            document.getElementById("results").appendChild(row);
+
+
+    }
+
+    function createElementFromHTML(htmlString) {
+        var div = document.createElement('div');
+        div.innerHTML = htmlString.trim();
+
+        // Change this to div.childNodes to support multiple top-level nodes
+        return div.firstChild;
+      }
+
+    function submitPostReq(){
+      //const url = 'https://reqres.in/api/users';
+      const url = 'http://127.0.0.1:5000/search';
+
+
+      // request options
+      const options = {
+          method: 'POST',
+          body: JSON.stringify(jsonData),
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          //mode: 'no-cors'
+      }
+
+      obj = [];
+      // send POST request
+      fetch(url, options)
+          .then(data => data.json())
+          .then(success => acceptResults(success));
+    }
+    document.getElementById("submit_qry").addEventListener("click", function() {
+      buildQuery(true);
+      submitPostReq();
+      });
+	//For News Added by sai
+	document.getElementById("submit_qry_forNews").addEventListener("click", function() {
+      buildQueryForNews(true);
+      submitPostReqForNews();
+      });
+	//end of sai
+    var current_page = 1;
+    var records_per_page = 3;
+
+    function changePagenation(sel) {
+      records_per_page = sel.options[sel.selectedIndex].text
+    }
+
+    function resetPagnation(){
+      document.getElementById("page").value = "";
+      btn_prev.style.visibility = "visible";
+      btn_next.style.visibility = "visible";
+    }
+
+    var objJson = []; // Can be obtained from another source, such as your objJson variable
+
+    function prevPage()
+    {
+        if (current_page > 1) {
+            current_page--;
+            changePage(current_page);
+        }
+    }
+
+    function nextPage()
+    {
+        if (current_page < numPages()) {
+            current_page++;
+            changePage(current_page);
+        }
+    }
+
+    function changePage(page)
+    {
+        var btn_next = document.getElementById("btn_next");
+        var btn_prev = document.getElementById("btn_prev");
+        var listing_table = document.getElementById("results");
+        var page_span = document.getElementById("page");
+
+        // Validate page
+        if (page < 1) page = 1;
+        if (page > numPages()) page = numPages();
+
+        listing_table.innerHTML = "";
+
+        for (var i = (page-1) * records_per_page; i < (page * records_per_page) && i < objJson.length; i++) {
+            buildResults(objJson[i]);
+        }
+        page_span.innerHTML = page + "/" + numPages();
+
+        if (page == 1) {
+            btn_prev.style.visibility = "hidden";
+        } else {
+            btn_prev.style.visibility = "visible";
+        }
+
+        if (page == numPages()) {
+            btn_next.style.visibility = "hidden";
+        } else {
+            btn_next.style.visibility = "visible";
+        }
+    }
+
+    function numPages()
+    {
+        return Math.ceil(objJson.length / records_per_page);
+    }
+	
+	//Added By sai
+function clearBox(elementID)
+{
+    document.getElementById(elementID).style.display = "none";
+	console.log(elementID);
+	//element.style.visibility = 'hidden';      // Hide
+     // Show
+}
+
+function displayBox(elementID)
+{
+console.log(elementID);
+//element.style.visibility = 'visible';
+   document.getElementById(elementID).style.display = "block";
+}
+function submitPostReqForNews(){
+      //const url = 'https://reqres.in/api/users';
+      const url = 'http://127.0.0.1:5000/news';
+
+
+      // request options
+      const options = {
+          method: 'POST',
+          body: JSON.stringify(jsonDataForNews),
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          //mode: 'no-cors'
+      }
+
+      obj = [];
+      // send POST request
+      fetch(url, options)
+          .then(data => data.json())
+          .then(success => acceptResultsForNews(success));
+    }
+	//end of sai
+</script>
+</html>
