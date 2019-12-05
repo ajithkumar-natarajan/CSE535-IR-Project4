@@ -197,7 +197,7 @@
     var qry = "";
     var countries = [];
     var language = [];
-    let topics = new set();
+    let topics = new Set();
     var to_date = "";
     var from_date = "";
     var verified = true;
@@ -284,7 +284,7 @@
       }
 
 
-      var topicArr = getCheckedBoxes(topicChkBox);
+      var topicArr = getCheckedBoxes('topicChkBox');
 
 
 
@@ -295,11 +295,14 @@
       jsonData["query"] = qry;
       jsonData["country"] = countries;
       jsonData["lang"] = language;
-      if(topicArr != null){
+      debugger;
+     /* if(topicArr != null){
         jsonData["topic"] =topicArr;
       }else{
         jsonData["topic"] = [];
-      }
+      }*/
+      
+
       jsonData["tweetDateFrom"] = from_date;
       jsonData["tweetDateTo"] = to_date;
 
@@ -344,7 +347,9 @@
           document.getElementById("results").appendChild(createElementFromHTML("<h3 style:'color:grey'>No search results found!</h3>"));
           resetPagnation();
         }else{
-          if(prevQry != jsonData['query']){
+          // debugger;
+          if(prevQry != jsonData['query'] || prevQry == '' || True){
+            // debugger;
             buildTopics(res);
           }
           changePage(1);
@@ -392,12 +397,17 @@
     }
 
     function buildTopics(res){
-      topics = new set();
+      topics = new Set();
+      // console.log(res[0]["topic"])
       for(tempres in res){
-        topics.add(tempres['topic']);
+        topics.add((res[tempres]["topic"][0]));
+        //topics.add(tempres['topic']);
       }
-      for(topic in topics){
-        document.getElementById("dynamic_topics").appendChild(createElementFromHTML("<li><input type='checkbox' name ='topicChkBox' onchange='fireQry()'>"+ topic+"</li>"));
+      topicsArray = Array.from(topics);
+      // debugger;
+      for(topic in topicsArray){
+        console.log(topic)
+        document.getElementById("dynamic_topics").appendChild(createElementFromHTML("<li><input type='checkbox' name ='topicChkBox' onchange='fireQry()'>"+ topicsArray[topic]+"</li>"));
       }
 
     }
@@ -446,9 +456,9 @@
 
 
       // request options
-      if(prevQry == ""){
-        prevQry = jsonData["query"];
-      }else if( prevQry != jsonData["query"]){
+      // if(prevQry == ""){
+      //   prevQry = jsonData["query"];
+      if( prevQry != jsonData["query"] && prevQry != ''){
         prevQry = jsonData["query"];
       }
 
