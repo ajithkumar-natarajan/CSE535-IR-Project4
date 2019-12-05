@@ -24,7 +24,7 @@ def returnJsonResult():
         data = request.data
         decodeddata = data.decode('utf-8')
         jsondata =json.loads(decodeddata)
-        # print(jsondata)
+        print(jsondata)
         
         
         # jsondata = {"query":"Lula", 
@@ -45,15 +45,20 @@ def returnJsonResult():
         #             "exactMatch":"false"}
         each_query =  jsondata.get('query')
         
+        each_query = each_query.replace(" ", "%20")
         if(each_query == ""):
             each_query = '#"*:*'
-        each_query = each_query.replace(":", "\:")
-        each_query = urllib.parse.quote(each_query)
+        else:
+            each_query = "text_hi%3A"+each_query+"%20or%0A"+"text_en%3A"+each_query+"%20or%0A"+"text_pt%3A"+each_query
+        # each_query = each_query.replace(":", "\:")
+        # each_query = urllib.parse.quote(each_query)
+        print(each_query)
         
         input_query = each_query
         
         ip = "18.217.246.4:8984"
-        IRModel = "IRF19P1"
+        # IRModel = "IRF19P1"
+        IRModel = "test"
         
         #country = ["india","usa"]
         country = jsondata.get('country')
@@ -88,6 +93,7 @@ def returnJsonResult():
             #if(i != len(country) -1)# or len(lang) > 0 or len(topic) > 0 or verified == "true"):
              #   fq = fq+append
 
+        # if(each_query != "ptshrikant"):
         if(len(lang)>0):
             if(filter_query == ""):
                 filter_query = "fq=" + "tweet_lang%3A" + lang[0]
@@ -97,10 +103,10 @@ def returnJsonResult():
         #if(len(lang) > 0)
         #    fq = fq +"tweet_lang%3A"+lang[0]
 
-        for i in range(1, len(lang)):
-            filter_query = filter_query + append + lang[i]
-            if(i != len(lang) - 1):# or len(topic) > 0 or verified == "true"):
-                filter_query = filter_query + append
+            for i in range(1, len(lang)):
+                filter_query = filter_query + append + lang[i]
+                if(i != len(lang) - 1):# or len(topic) > 0 or verified == "true"):
+                    filter_query = filter_query + append
 
         if(len(topic) > 0):
              if(filter_query == ""):
@@ -113,11 +119,18 @@ def returnJsonResult():
             #if(i != len(topic) -1 or verified == "true"):
              #   fq = fq+append       
 
-        if(verified == "true"):
+
+        if(verified == True):
              if(filter_query == ""):
                 filter_query = "fq=" + "verified%3Atrue"
              else:
                 filter_query = filter_query + and_append + "verified%3Atrue"
+        
+        if(verified == False):
+             if(filter_query == ""):
+                filter_query = "fq=" + "verified%3Afalse"
+             else:
+                filter_query = filter_query + and_append + "verified%3Afalse"
 
         
         #2019-09-07T00:00:00Z TO 2019-09-08T00:00:00Z
@@ -176,6 +189,8 @@ def returnJsonResult():
         #tweet_date:[2019-09-07T00:00:00Z TO 2019-09-08T00:00:00Z] AND verified:true 
         if(exact_match):
             inurl = 'http://' + ip + '/solr/' + IRModel + '/select?' + filter_query + '&q='+ input_query +'&rows=1000'
+            # if(jsondata.get('query') == "isro"):
+            #     inurl = 'http://' + ip + '/solr/' + IRModel + '/select?' + filter_query + '&q='+ input_query +'&rows=124'
         else:
             inurl = 'http://' + ip+'/solr/' + IRModel + '/select?defType=edismax&' + filter_query +'&q=' + input_query +'&rows=1000'
 
@@ -202,6 +217,7 @@ def returnJsonResult():
         hashtags_list = list()
         mentions_list = list()
         date_lang_list = dict()
+        topics = dict()
 
         for i in range(len(docs)):
             try:
@@ -210,11 +226,17 @@ def returnJsonResult():
                 date_list.append(docs[i].get("tweet_date")[0][0:10])
                 doc_tweet_lang = docs[i].get("tweet_lang")[0]
                 lang_list.append(doc_tweet_lang)
+                tweet_topic = docs[i].get("topic")[0]
                 if(doc_tweet_lang in date_lang_list):
                     date_lang_list[doc_tweet_lang].append(docs[i].get("tweet_date")[0][0:10])
                 else:
                     date_lang_list[doc_tweet_lang] = list()
                     date_lang_list[doc_tweet_lang].append(docs[i].get("tweet_date")[0][0:10])
+                if(tweet_topic in topics):
+                    topics[tweet_topic] = topics.get(tweet_topic)+1
+                else:
+                    topics[tweet_topic] = 1
+                
                 country_list.append(docs[i].get("country")[0])
                 hashtags_list.append(docs[i].get("hashtags")[0])
                 mentions_list.append(docs[i].get("mentions")[0])
@@ -245,7 +267,7 @@ def returnJsonResult():
         fig = px.choropleth(country_df, locations="country code",
                             color="Tweets",
                             hover_name="country",
-                            color_continuous_scale='Blues')
+                            color_continuous_scale='plasma')
         # pio.show(fig)
         # pio.write_html(fig, file='Location.html', default_width='370px', default_height='370px')
         fig.update_layout(title="Heatmap of count of tweets from different countries")
@@ -331,6 +353,12 @@ def returnJsonResult():
         # pio.show(fig)
         # pio.write_html(fig, file='Mentions.html', default_width='370px', default_height='370px')
         pio.write_html(fig, file='Mentions.html')
+
+        fig = go.Figure(data=[go.Pie(labels=list(topics.keys()), values=list(topics.values()))])
+        # pio.show(fig)
+        # pio.write_html(fig, file='Topics.html', default_width='370px', default_height='370px')
+        fig.update_layout(title="Pie chart of count of tweets in different languages")
+        pio.write_html(fig, file='Topics.html')
 
         fig = go.Figure(data=[go.Pie(labels=list(sentiment_list.keys()), values=list(sentiment_list.values()))])
         # pio.show(fig)
