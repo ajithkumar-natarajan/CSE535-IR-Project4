@@ -89,11 +89,7 @@
         </li>
         <li class="active"><a>Search by Topic</a>
           <br>
-          <ul>
-            <li><input type="checkbox"  onchange="fireQry()"> checkbox 1</li>
-            <li><input type="checkbox"  onchange="fireQry()"> checkbox 2</li>
-            <li><input type="checkbox"  onchange="fireQry()"> checkbox 3</li>
-            <li><input type="checkbox"  onchange="fireQry()"> checkbox 4</li>
+          <ul id = "dynamic_topics">
           </ul>
           <br>
         </li>
@@ -175,6 +171,9 @@
             <option>Mentions</option>
             <option>Topics</option>
             <option>Sentiments</option>
+            <option>Tweet cloud - USA</option>
+            <option>Tweet cloud - INDIA</option>
+            <option>Tweet cloud - BRAZIL</option>
           </select>
           <div class="graphCont" id="graphContent" style="float:left">
             <iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Location.html" height="550" width="100%"></iframe>
@@ -198,11 +197,12 @@
     var qry = "";
     var countries = [];
     var language = [];
-    var topics = [];
+    let topics = new set();
     var to_date = "";
     var from_date = "";
     var verified = true;
     var similar  = false;
+    var prevQry = "";
     var jsonData =  {"query":"",
                     "country":[],
                     "lang":[],
@@ -283,6 +283,11 @@
         language.push("hi");
       }
 
+
+      var topicArr = getCheckedBoxes(topicChkBox);
+
+
+
       to_date = document.getElementById('datepicker2').value;
       from_date = document.getElementById('datepicker1').value;
       to_date = document.getElementById('datepicker2').value;
@@ -290,7 +295,11 @@
       jsonData["query"] = qry;
       jsonData["country"] = countries;
       jsonData["lang"] = language;
-      jsonData["topic"] = [];
+      if(topicArr != null){
+        jsonData["topic"] =topicArr;
+      }else{
+        jsonData["topic"] = [];
+      }
       jsonData["tweetDateFrom"] = from_date;
       jsonData["tweetDateTo"] = to_date;
 
@@ -335,6 +344,9 @@
           document.getElementById("results").appendChild(createElementFromHTML("<h3 style:'color:grey'>No search results found!</h3>"));
           resetPagnation();
         }else{
+          if(prevQry != jsonData['query']){
+            buildTopics(res);
+          }
           changePage(1);
         }
     }
@@ -379,6 +391,32 @@
 
     }
 
+    function buildTopics(res){
+      topics = new set();
+      for(tempres in res){
+        topics.add(tempres['topic']);
+      }
+      for(topic in topics){
+        document.getElementById("dynamic_topics").appendChild(createElementFromHTML("<li><input type='checkbox' name ='topicChkBox' onchange='fireQry()'>"+ topic+"</li>"));
+      }
+
+    }
+
+    // Pass the checkbox name to the function
+    function getCheckedBoxes(chkboxName) {
+      var checkboxes = document.getElementsByName(chkboxName);
+      var checkboxesChecked = [];
+      // loop over them all
+      for (var i=0; i<checkboxes.length; i++) {
+         // And stick the checked ones onto an array...
+         if (checkboxes[i].checked) {
+            checkboxesChecked.push(checkboxes[i]);
+         }
+      }
+      // Return the array if it is non-empty, or null
+      return checkboxesChecked.length > 0 ? checkboxesChecked : null;
+    }
+
     function buildResultsForNews(res){
           //debugger;
 
@@ -408,6 +446,12 @@
 
 
       // request options
+      if(prevQry == ""){
+        prevQry = jsonData["query"];
+      }else if( prevQry != jsonData["query"]){
+        prevQry = jsonData["query"];
+      }
+
       const options = {
           method: 'POST',
           body: JSON.stringify(jsonData),
@@ -491,6 +535,12 @@
         document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Topics.html" height="550" width="100%"></iframe>'));
       }else if(newMetric === 'Sentiments'){
         document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Sentiments.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Tweet cloud - USA'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="tweet_cloud_USA.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Tweet cloud - INDIA'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="tweet_cloud_India.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Tweet cloud - BRAZIL'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="tweet_cloud_Brazil.html" height="550" width="100%"></iframe>'));
       }
     }
 
