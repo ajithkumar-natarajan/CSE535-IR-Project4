@@ -284,7 +284,6 @@
       }
 
 
-      var topicArr = getCheckedBoxes('topicChkBox');
 
 
 
@@ -295,13 +294,12 @@
       jsonData["query"] = qry;
       jsonData["country"] = countries;
       jsonData["lang"] = language;
-      debugger;
      /* if(topicArr != null){
         jsonData["topic"] =topicArr;
       }else{
         jsonData["topic"] = [];
       }*/
-      
+
 
       jsonData["tweetDateFrom"] = from_date;
       jsonData["tweetDateTo"] = to_date;
@@ -339,6 +337,7 @@
 	//End Of SAI
     function acceptResults(res){
       objJson = res;
+      masterJson =objJson;
       const myNode = document.getElementById("results");
         while (myNode.firstChild) {
           myNode.removeChild(myNode.firstChild);
@@ -347,12 +346,10 @@
           document.getElementById("results").appendChild(createElementFromHTML("<h3 style:'color:grey'>No search results found!</h3>"));
           resetPagnation();
         }else{
-          // debugger;
-          if(prevQry != jsonData['query'] || prevQry == '' || True){
-            // debugger;
             buildTopics(res);
+            changePage(1);
           }
-          changePage(1);
+
         }
     }
 
@@ -398,6 +395,7 @@
 
     function buildTopics(res){
       topics = new Set();
+      document.getElementById("dynamic_topics").innerHTML = "";
       // console.log(res[0]["topic"])
       for(tempres in res){
         topics.add((res[tempres]["topic"][0]));
@@ -407,9 +405,20 @@
       // debugger;
       for(topic in topicsArray){
         console.log(topic)
-        document.getElementById("dynamic_topics").appendChild(createElementFromHTML("<li><input type='checkbox' name ='topicChkBox' onchange='fireQry()'>"+ topicsArray[topic]+"</li>"));
+        document.getElementById("dynamic_topics").appendChild(createElementFromHTML("<li><input type='checkbox' name ='topicChkBox' onchange='topicFilter()'>"+ topicsArray[topic]+"</li>"));
       }
 
+    }
+
+    function topicFilter(){
+      objJson = [];
+      var topicsArray = getCheckedBoxes('topicChkBox');
+      for (obj in masterJson){
+        if(topicsArray.contains(obj['topic'])){
+          objJson.add(obj);
+        }
+      }
+      changePage(1);
     }
 
     // Pass the checkbox name to the function
@@ -555,6 +564,7 @@
     }
 
     var objJson = []; // Can be obtained from another source, such as your objJson variable
+    var masterJson =[];
 
     function prevPage()
     {
