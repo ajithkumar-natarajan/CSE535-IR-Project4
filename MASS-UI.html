@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TEAM MASS - Twitter Search Engine</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+  <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+
+  <style>
+    /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
+    .row.content {height: 1500px}
+
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height: auto;}
+    }
+
+    .master_analytics {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .anal_dropdown{
+      width: 20%;
+      left: 40%;
+      top: 21vh;
+      position: absolute;
+      border: 1px solid red;
+   }
+   .graphCont{
+     border: 2px solid blue;
+     width: 720px;
+     position: relative;
+     top: 15vh;
+     display: flex;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-2 sidenav">
+      <h4>SEARCH TWITTER</h4>
+      <h>by TEAM MASS</h5>
+      <ul class="nav nav-pills nav-stacked">
+        <li class="active"><a>Search by Country</a>
+          <br>
+          <ul>
+            <li><input type="checkbox" onchange="fireQry()" id ="us"> United States</li>
+            <li><input type="checkbox" onchange="fireQry()" id ="bra"> Brazil</li>
+            <li><input type="checkbox" onchange="fireQry()" id ="ind"> India</li>
+          </ul>
+          <br>
+        </li>
+        <li class="active"><a>Search by Language</a>
+          <br>
+          <ul>
+            <li><input type="checkbox" onchange="fireQry()" id="eng"> English</li>
+            <li><input type="checkbox" onchange="fireQry()" id="por"> Portuguese</li>
+            <li><input type="checkbox" onchange="fireQry()" id="hi"> Hindi</li>
+          </ul>
+          <br>
+        </li>
+        <li class="active"><a>Search by Topic</a>
+          <br>
+          <ul>
+            <li><input type="checkbox"  onchange="fireQry()"> checkbox 1</li>
+            <li><input type="checkbox"  onchange="fireQry()"> checkbox 2</li>
+            <li><input type="checkbox"  onchange="fireQry()"> checkbox 3</li>
+            <li><input type="checkbox"  onchange="fireQry()"> checkbox 4</li>
+          </ul>
+          <br>
+        </li>
+        <li class="active"><a href="#section1">Filter by Date</a>
+          <br>
+          <ul>
+            <li>From date:</br><input type="text"  onchange="fireQry()" id="datepicker1"></li>
+            <li>To date:</br><input type="text"  onchange="fireQry()" id="datepicker2"></li>
+          </ul>
+          <br>
+        </li>
+        <li class="active"><a href="#section1">Number of Results Per Page</a>
+          <br>
+          <ul>
+            <li>
+              <select id="mySelect" onChange="changePagenation(this); fireQry()">
+                <option>3</option>
+                <option>5</option>
+                <option selected="selected">10</option>
+                <option>20</option>
+              </select>
+            </li>
+          </ul>
+          <br>
+        </li>
+        <li class="active"><a href="#section1">Miscellaneous Settings</a>
+          <br>
+          <ul>
+            <li><input type="checkbox"  onchange="fireQry()" id="verified" checked> Verified</li>
+            <li><input type="checkbox"  onchange="fireQry()" id="similar"> Display similar results</li>
+          </ul>
+          <br>
+        </li>
+      </ul><br>
+
+      <!-- <div class="input-group">
+        <input type="text" class="form-control" id="mini_qry" placeholder="Search tweets..">
+        <span class="input-group-btn">
+          <button class="btn btn-default" id="submit_mini_qry" type="button">
+            <span class="glyphicon glyphicon-search"></span>
+          </button>
+        </span>
+      </div> -->
+    </div>
+
+    <div class="col-sm-10">
+      <h4>
+        <small>
+          <div class="input-group">
+          <input type="text" class="form-control" id="master_qry" placeholder="Search tweets..">
+            <span class="input-group-btn">
+              <button class="btn btn-default" id="submit_qry" type="button">
+                <span class="glyphicon glyphicon-search"></span>
+              </button>
+            </span>
+          </div>
+        </small>
+      </h4>
+      <hr>
+	  <!-- Tab links -->
+<div class="tab">
+  <button class="tablinks" id="submit_qry_forTweet">TweetSearch</button>
+  <button class="tablinks" id="submit_qry_forNews">News</button>
+  <button class="tablinks" id="submit_qry_forAnal">Analytics</button>
+</div>
+
+<!-- Tab content -->
+
+      <div id="results" ></div>
+  	  <div id="results1" style="display:none"></div>
+  	  <div id="results2" style="display:none">
+        <div class ="master_analytics">
+          <select class="anal_dropdown" id="analytics_dropdown" style="float:left" onChange="changeAnalytics(this);">
+            <option>Location</option>
+            <option>Language</option>
+            <option>Time series (by language)</option>
+            <option>Time series</option>
+            <option>Hashtags</option>
+            <option>Mentions</option>
+            <option>Topics</option>
+            <option>Sentiments</option>
+          </select>
+          <div class="graphCont" id="graphContent" style="float:left">
+            <iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Location.html" height="550" width="100%"></iframe>
+          </div>
+        </div>
+      </div>
+      <div id="pagenationCont">
+        <a href="javascript:prevPage()" id="btn_prev">Prev</a>
+        <a href="javascript:nextPage()" id="btn_next">Next</a>
+        page: <span id="page"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+<script>
+
+    var activeTabNum = '1';
+    let obj = [];
+    var qry = "";
+    var countries = [];
+    var language = [];
+    var topics = [];
+    var to_date = "";
+    var from_date = "";
+    var verified = true;
+    var similar  = false;
+    var jsonData =  {"query":"",
+                    "country":[],
+                    "lang":[],
+                    "verified":"true",
+                    "topic":[],
+                    "tweetDateFrom":"",
+                   "tweetDateTo":"",
+                    "exactMatch":"true"};
+	var jsonDataForNews =  {"query":""};
+
+    var picker1 = new Pikaday({ field: document.getElementById('datepicker1') ,format: 'YYYY-MM-DD',toString(date, format) {
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${year}-${month}-${day}`;
+    },
+    parse(dateString, format) {
+        // dateString is the result of `toString` method
+        const parts = dateString.split('/');
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        return new Date(year, month, day);
+    }});
+    var picker2 = new Pikaday({ field: document.getElementById('datepicker2') ,format: 'YYYY-MM-DD',toString(date, format) {
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${year}-${month}-${day}`;
+    },
+    parse(dateString, format) {
+        // dateString is the result of `toString` method
+        const parts = dateString.split('/');
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        return new Date(year, month, day);
+    }});
+
+
+
+
+    function buildQuery(flag){
+      jsonData = {"query":"",
+                      "country":[],
+                      "lang":[],
+                      "verified":"",
+                      "topic":[],
+                      "tweetDateFrom":"",
+                     "tweetDateTo":"",
+                      "exactMatch":"true"};
+      if(flag){
+        qry = document.getElementById("master_qry").value;
+      }else{
+        qry = document.getElementById("mini_qry").value;
+      }
+      countries = [];
+      language = [];
+      topics = [];
+      to_date = "";
+      from_date = "";
+      if(document.getElementById("us").checked){
+        countries.push("USA");
+      }
+      if(document.getElementById("bra").checked){
+        countries.push("Brazil");
+      }
+      if(document.getElementById("ind").checked){
+        countries.push("India");
+      }
+      if(document.getElementById("eng").checked){
+        language.push("en");
+      }
+      if(document.getElementById("por").checked){
+        language.push("pt");
+      }
+      if(document.getElementById("hi").checked){
+        language.push("hi");
+      }
+
+      to_date = document.getElementById('datepicker2').value;
+      from_date = document.getElementById('datepicker1').value;
+      to_date = document.getElementById('datepicker2').value;
+      from_date = document.getElementById('datepicker1').value;
+      jsonData["query"] = qry;
+      jsonData["country"] = countries;
+      jsonData["lang"] = language;
+      jsonData["topic"] = [];
+      jsonData["tweetDateFrom"] = from_date;
+      jsonData["tweetDateTo"] = to_date;
+
+      jsonData["verified"] = document.getElementById("verified").checked;
+      jsonData["exactMatch"] = !(document.getElementById("similar").checked);
+
+    }
+	//Added By SAI
+	function buildQueryForNews(flag){
+      jsonDataForNews = {"query":""};
+      if(flag){
+        qry = document.getElementById("master_qry").value;
+      }else{
+        qry = document.getElementById("mini_qry").value;
+      }
+	  jsonDataForNews["query"] = qry;
+
+
+    }
+	function acceptResultsForNews(res)
+	{
+	objJson = res;
+      const myNode = document.getElementById("results");
+        while (myNode.firstChild) {
+          myNode.removeChild(myNode.firstChild);
+        }
+        if(res.length == 0){
+          document.getElementById("results").appendChild(createElementFromHTML("<h3 style:'color:grey'>No search results found!</h3>"));
+          resetPagnation();
+        }else{
+          changePage(1);
+        }
+	}
+	//End Of SAI
+    function acceptResults(res){
+      objJson = res;
+      const myNode = document.getElementById("results");
+        while (myNode.firstChild) {
+          myNode.removeChild(myNode.firstChild);
+        }
+        if(res.length == 0){
+          document.getElementById("results").appendChild(createElementFromHTML("<h3 style:'color:grey'>No search results found!</h3>"));
+          resetPagnation();
+        }else{
+          changePage(1);
+        }
+    }
+
+    function buildResults(res){
+          //debugger;
+
+            var row = createElementFromHTML("<hr>");
+            var h3 = createElementFromHTML("<h3>"+res['_version_']+"</h3>");
+            var dt = createElementFromHTML("<h5><span class='glyphicon glyphicon-time' ></span> Tweet by "+res['poi_name']+", "+res['tweet_date']+".</h5>");
+            document.getElementById("results").appendChild(h3);
+            document.getElementById("results").appendChild(dt);
+            if(typeof res['mentions'] !== 'undefined' && res['mentions'].length > 0){
+              var mentionStr = "<h5>";
+              for (const mention of res['mentions']){
+                mentionStr = mentionStr+ "<span class='label label-danger' style='margin-right:8px'>@"+mention+"</span>";
+              }
+              mentionStr = mentionStr + "</h5>";
+              document.getElementById("results").appendChild(createElementFromHTML(mentionStr));
+            }
+            if(typeof res['hashtags'] !== 'undefined' && res['hashtags'].length > 0){
+              var hashtagStr = "<h5>";
+              for (const hashtag of res['hashtags']){
+                hashtagStr = hashtagStr+ "<span class='label label-primary' style='margin-right:8px'>#"+hashtag+"</span>";
+              }
+              hashtagStr = hashtagStr + "</h5>";
+              document.getElementById("results").appendChild(createElementFromHTML(hashtagStr));
+            }
+
+            document.getElementById("results").appendChild(createElementFromHTML("<p>"+res['tweet_text']+"</p>"));
+
+            if(res['sentiment'] === 'positive'){
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-up-16.png' alt='POSTIVE' height='16' width='16'></h5>"));
+            }else if(res['sentiment'] === 'neutral'){
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='so-so-16.png' alt='NEUTRAL' height='16' width='16'></h5>"));
+            }else if(res['sentiment'] === 'negative'){
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-down-16.png' alt='NEGATIVE' height='16' width='16'></h5>"));
+            }
+
+            document.getElementById("results").appendChild(row);
+
+
+    }
+
+    function buildResultsForNews(res){
+          //debugger;
+
+            var row = createElementFromHTML("<hr>");
+            var h3 = createElementFromHTML("<h3>"+res['title']+"</h3>");
+            var dt = createElementFromHTML("<a href="+res['url']+"><h5>"+res['url']+"</h5></a>");
+
+            document.getElementById("results1").appendChild(h3);
+            document.getElementById("results1").appendChild(dt);
+            document.getElementById("results1").appendChild(createElementFromHTML("<p>"+res['desc']+"</p>"));
+            document.getElementById("results1").appendChild(row);
+
+
+    }
+
+    function createElementFromHTML(htmlString) {
+        var div = document.createElement('div');
+        div.innerHTML = htmlString.trim();
+
+        // Change this to div.childNodes to support multiple top-level nodes
+        return div.firstChild;
+      }
+
+    function submitPostReq(){
+      //const url = 'https://reqres.in/api/users';
+      const url = 'http://127.0.0.1:5000/search';
+
+
+      // request options
+      const options = {
+          method: 'POST',
+          body: JSON.stringify(jsonData),
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          //mode: 'no-cors'
+      }
+
+      obj = [];
+      // send POST request
+      fetch(url, options)
+          .then(data => data.json())
+          .then(success => acceptResults(success));
+    }
+
+  document.getElementById("submit_qry").addEventListener("click", function() {
+    document.getElementById("submit_qry_forTweet").click();
+    });
+	//For News Added by sai
+	document.getElementById("submit_qry_forNews").addEventListener("click", function() {
+      displayBox('pagenationCont');
+      clearBox('results');
+      displayBox('results1');
+      clearBox('results2');
+      activeTab('2');
+      buildQueryForNews(true);
+      submitPostReqForNews();
+      });
+  document.getElementById("submit_qry_forTweet").addEventListener("click", function() {
+      activeTabNum = "1";
+      displayBox('pagenationCont');
+      buildQuery(true);
+      submitPostReq();
+      displayBox('results');
+      clearBox('results1');
+      clearBox('results2');
+      activeTab('1');
+
+      });
+
+  document.getElementById("submit_qry_forAnal").addEventListener("click", function() {
+      clearBox('pagenationCont');
+      clearBox('results');
+      clearBox('results1');
+      displayBox('results2');
+      activeTab('3');
+      });
+
+
+	//end of sai
+    var current_page = 1;
+    var records_per_page = 10;
+
+    function changePagenation(sel) {
+      records_per_page = sel.options[sel.selectedIndex].text
+    }
+
+    function resetPagnation(){
+      document.getElementById("page").value = "";
+      btn_prev.style.visibility = "visible";
+      btn_next.style.visibility = "visible";
+    }
+
+    function changeAnalytics(sel){
+      document.getElementById("graphContent").innerHTML = "";
+      var newMetric = sel.options[sel.selectedIndex].text;
+      if(newMetric === 'Location'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Location.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Language'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Language.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Time series (by language)'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="TimeSeriesLanguage.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Time series'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="TimeSeries.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Hashtags'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Hashtags.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Mentions'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Mentions.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Topics'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Topics.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Sentiments'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Sentiments.html" height="550" width="100%"></iframe>'));
+      }
+    }
+
+    var objJson = []; // Can be obtained from another source, such as your objJson variable
+
+    function prevPage()
+    {
+        if (current_page > 1) {
+            current_page--;
+            changePage(current_page);
+        }
+    }
+
+    function nextPage()
+    {
+        if (current_page < numPages()) {
+            current_page++;
+            changePage(current_page);
+        }
+    }
+
+    function changePage(page)
+    {
+        var btn_next = document.getElementById("btn_next");
+        var btn_prev = document.getElementById("btn_prev");
+        var page_span = document.getElementById("page");
+        if(activeTabNum === '1'){
+          var listing_table = document.getElementById("results");
+        }else if (activeTabNum === '2') {
+          var listing_table = document.getElementById("results1");
+        }
+
+        // Validate page
+        if (page < 1) page = 1;
+        if (page > numPages()) page = numPages();
+
+        listing_table.innerHTML = "";
+        for (var i = (page-1) * records_per_page; i < (page * records_per_page) && i < objJson.length; i++) {
+          if(activeTabNum === '1'){
+            buildResults(objJson[i]);
+          }else if (activeTabNum === '2') {
+            buildResultsForNews(objJson[i]);
+          }
+        }
+        page_span.innerHTML = page + "/" + numPages();
+
+        if (page == 1) {
+            btn_prev.style.visibility = "hidden";
+        } else {
+            btn_prev.style.visibility = "visible";
+        }
+
+        if (page == numPages()) {
+            btn_next.style.visibility = "hidden";
+        } else {
+            btn_next.style.visibility = "visible";
+        }
+    }
+
+    function numPages()
+    {
+        return Math.ceil(objJson.length / records_per_page);
+    }
+
+	//Added By sai
+function clearBox(elementID)
+{
+    document.getElementById(elementID).style.display = "none";
+	console.log(elementID);
+	//element.style.visibility = 'hidden';      // Hide
+     // Show
+}
+
+function displayBox(elementID)
+{
+console.log(elementID);
+//element.style.visibility = 'visible';
+   document.getElementById(elementID).style.display = "block";
+}
+
+function activeTab(tab){
+  activeTabNum = tab;
+}
+
+function fireQry(){
+  document.getElementById("submit_qry").click();
+}
+
+$(document).keyup(function(event) {
+    if ($(".form-control").is(":focus") && event.key == "Enter") {
+        fireQry();
+    }
+});
+
+function submitPostReqForNews(){
+      //const url = 'https://reqres.in/api/users';
+      const url = 'http://127.0.0.1:5000/news';
+
+
+      // request options
+      const options = {
+          method: 'POST', // change to post in final versionßß
+          body: JSON.stringify(jsonDataForNews), // need body in final
+          headers: {
+              'Content-Type': 'application/json',
+              // 'secret-key':'$2b$10$nFoRg3IHB27xp54lYEotueIZaQeOpTDIvWFc0mGdnITPOTN4XFqGe' // remove it in final version
+          },
+          // mode: 'no-cors'
+      }
+
+      obj = [];
+      // send POST request
+      fetch(url, options)
+          .then(data => data.json())
+          .then(success => acceptResultsForNews(success));
+    }
+	//end of sai
+</script>
+</html>
