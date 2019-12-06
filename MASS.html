@@ -356,7 +356,8 @@
           // debugger;
 
             var row = createElementFromHTML("<hr>");
-            var h3 = createElementFromHTML("<h3>"+res['_version_']+"</h3>");
+            var link = 'https://twitter.com/' + res['poi_name'];
+            var h3 = createElementFromHTML("<a href=" + link +" target='_blank'>" + link + "</a>");
             var dt = createElementFromHTML("<h5><span class='glyphicon glyphicon-time' ></span> Tweet by "+res['poi_name']+" on "+res['tweet_date']+".</h5>");
             document.getElementById("results").appendChild(h3);
             document.getElementById("results").appendChild(dt);
@@ -469,7 +470,11 @@
 
     function submitPostReq(){
       //const url = 'https://reqres.in/api/users';
-      const url = 'http://127.0.0.1:5000/search';
+      // Uncomment below line to run in local system (Comment below line to in server)
+      // const url = 'http://127.0.0.1:5000/search';
+
+      // Comment below line to run in local system (Uncomment below line to in server)
+      const url = 'http://3.16.56.29:5000/search';
 
 
       // request options
@@ -665,7 +670,12 @@ $(document).keyup(function(event) {
 
 function submitPostReqForNews(){
       //const url = 'https://reqres.in/api/users';
-      const url = 'http://127.0.0.1:5000/news';
+
+      // Uncomment below line to run in local system (Comment below line to in server)
+      // const url = 'http://127.0.0.1:5000/news';
+
+      // Comment below line to run in local system (Uncomment below line to in server)
+      const url = 'http://3.16.56.29:5000/news';
 
 
       // request options

@@ -13,6 +13,7 @@ import tweepy
 from tweepy import OAuthHandler 
 from textblob import TextBlob
 from flask_cors import CORS, cross_origin
+import os
 
 
 app = Flask(__name__)
@@ -25,7 +26,7 @@ def returnJsonResult():
         data = request.data
         decodeddata = data.decode('utf-8')
         jsondata =json.loads(decodeddata)
-        print(jsondata)
+        # print(jsondata)
         
         
         # jsondata = {"query":"Lula", 
@@ -50,10 +51,11 @@ def returnJsonResult():
         if(each_query == ""):
             each_query = '#"*:*'
         else:
-            each_query = "text_hi%3A"+each_query+"%20or%0A"+"text_en%3A"+each_query+"%20or%0A"+"text_pt%3A"+each_query
+            # each_query = "text_hi%3A"+each_query+"%20or%20"+"text_en%3A"+each_query+"%20or%20"+"text_pt%3A"+each_query
+            pass
         # each_query = each_query.replace(":", "\:")
         # each_query = urllib.parse.quote(each_query)
-        print(each_query)
+        # print(each_query)
         
         input_query = each_query
         
@@ -183,7 +185,7 @@ def returnJsonResult():
             else:
                 filter_query = filter_query + and_append + date_filter
 
-        print(filter_query)
+        # print(filter_query)
         #http://18.218.221.88:8984/solr/BM25/select?defType=edismax&q=ARTIKEL&wt=json
         #http://18.218.221.88:8984/solr/BM25/select?defType=edismax&q=Anti-Refugee%20Rally%20in%20Dresden&fl=id%2Cscore&wt=json&indent=true&rows=20
         #http://ec2-18-219-82-180.us-east-2.compute.amazonaws.com:8984/solr/IRF19P1/select?fq=tweet_date%3A%5B2019-09-07T00%3A00%3A00Z%20TO%202019-09-08T00%3A00%3A00Z%5D%20AND%20verified%3Atrue&q=*%3A*
@@ -200,7 +202,7 @@ def returnJsonResult():
         data = urllib.request.urlopen(inurl)
         docs = json.load(data)['response']['docs']
         #print(docs)
-        print("length:", len(docs))
+        # print("length:", len(docs))
 
         sentiment_list = dict()
         sentiment_list['positive'] = 0
@@ -211,6 +213,24 @@ def returnJsonResult():
             tweet_texts['sentiment'] = sentiment
             sentiment_list[sentiment] = sentiment_list.get(sentiment)+1
             # print(tweet_texts)
+
+        # files = [f for f in os.listdir('.') if os.path.isfile(f)]
+        # for f in files:
+        #     print(f)
+
+        # os.remove("Hashtags.html")
+        # os.remove("Language.html")
+        # os.remove("Location.html")
+        # os.remove("Mentions.html")
+        # os.remove("Sentiments.html")
+        # os.remove("TimeSeries.html")
+        # os.remove("TimeSeriesLanguage.html")
+        # os.remove("Topics.html")
+
+        # print("-----------------------------------------------------------------")
+        # files = [f for f in os.listdir('.') if os.path.isfile(f)]
+        # for f in files:
+        #     print(f)
 
         date_list = list()
         lang_list = list()
@@ -224,7 +244,9 @@ def returnJsonResult():
             try:
                 # date_time = docs[i].get("tweet_date")[0].find("T")
                 # print(date_time)
-                date_list.append(docs[i].get("tweet_date")[0][0:10])
+                tweet_date = docs[i].get("tweet_date")[0][0:10]
+                date_list.append(tweet_date)
+                docs[i]["tweet_date"] = tweet_date
                 doc_tweet_lang = docs[i].get("tweet_lang")[0]
                 lang_list.append(doc_tweet_lang)
                 tweet_topic = docs[i].get("topic")[0]
@@ -239,8 +261,15 @@ def returnJsonResult():
                     topics[tweet_topic] = 1
                 
                 country_list.append(docs[i].get("country")[0])
-                hashtags_list.append(docs[i].get("hashtags")[0])
-                mentions_list.append(docs[i].get("mentions")[0])
+                # print(country_list)
+                (hashtags_list.append(docs[i].get("hashtags.text")[0]) if docs[i].get("hashtags.text")[0] is not None else None)
+                # if(docs[i].get("hashtags")[0]):
+                #     hashtags_list.append(docs[i].get("hashtags")[0])
+                # print(hashtags_list)
+                # if(docs[i].get("mentions")[0]):
+                (mentions_list.append(docs[i].get("mentions")[0]) if docs[i].get("mentions")[0] is not None else None)
+                    # mentions_list.append(docs[i].get("mentions")[0])
+                # print(mentions_list)
             except:
                 pass
         # print(date_list)
@@ -250,6 +279,7 @@ def returnJsonResult():
         country_list = dict(Counter(country_list))
         hashtags_list = dict(Counter(hashtags_list))
         mentions_list = dict(Counter(mentions_list))
+        # print(len(mentions_list))
 
         for key in date_lang_list:
             date_lang_list[key] = dict(Counter(date_lang_list[key]))
@@ -271,7 +301,7 @@ def returnJsonResult():
                             color_continuous_scale='plasma')
         # pio.show(fig)
         # pio.write_html(fig, file='Location.html', default_width='370px', default_height='370px')
-        fig.update_layout(title="Heatmap of count of tweets from different countries")
+        fig.update_layout(title="Heatmap of count of tweets from different countries.")
         pio.write_html(fig, file='Location.html')
 
         fig = go.Figure(data=[go.Pie(labels=list(lang_list.keys()), values=list(lang_list.values()))])
@@ -338,7 +368,7 @@ def returnJsonResult():
         # fig.update_xaxes(title_text='Hashtags')
         # fig.update_yaxes(title_text='No of tweets')
 
-        # pio.show(fig)
+        pio.show(fig)
         # pio.write_html(fig, file='Hashtags.html', default_width='370px', default_height='370px')
         pio.write_html(fig, file='Hashtags.html')
 
@@ -354,6 +384,8 @@ def returnJsonResult():
         # pio.show(fig)
         # pio.write_html(fig, file='Mentions.html', default_width='370px', default_height='370px')
         pio.write_html(fig, file='Mentions.html')
+        # print(len(list(mentions_list.keys())))
+        # print(len(list(mentions_list.values())))
 
         fig = go.Figure(data=[go.Pie(labels=list(topics.keys()), values=list(topics.values()))])
         # pio.show(fig)
@@ -378,7 +410,9 @@ def returnJsonResult():
     #print(docs[1])
     #print("leng",len(docs))
 
-
+        # print(country_df)
+        # del country_data
+        # del country_df
         return json.dumps(docs)
 
 # def main():
@@ -436,14 +470,14 @@ def returnNewsJsonResult():
             newsJson['url'] = result.link
             newsList.append(newsJson)
 
-        print(json.dumps(newsList))
+        # print(json.dumps(newsList))
         return json.dumps(newsList)
 
 
 if __name__ == "__main__":
     # print("In program")
     #Uncomment below line to run in local system (Comment below line to in server)
-    app.run()
+    # app.run()
     #Comment below line to run in local system (Uncomment below line to in server)
     app.run(host= '0.0.0.0')
     # returnNewsJsonResult()
