@@ -403,7 +403,7 @@
       topicsArray = Array.from(topics);
       // debugger;
       for(topic in topicsArray){
-        console.log(topic)
+        // console.log(topic)
         document.getElementById("dynamic_topics").appendChild(createElementFromHTML("<li><input type='checkbox' name ='topicChkBox' value ='"+ topicsArray[topic] + "' onchange='topicFilter()'>"+ topicsArray[topic]+"</li>"));
       }
 
@@ -436,7 +436,7 @@
          // And stick the checked ones onto an array...
          if (checkboxes[i].checked) {
             // console.log(checkboxes[i].innerHTML);
-            console.log(checkboxes[i].value);
+            // console.log(checkboxes[i].value);
             checkboxesChecked.push(checkboxes[i].value);
          }
       }
@@ -637,14 +637,14 @@
 function clearBox(elementID)
 {
     document.getElementById(elementID).style.display = "none";
-	console.log(elementID);
+	// console.log(elementID);
 	//element.style.visibility = 'hidden';      // Hide
      // Show
 }
 
 function displayBox(elementID)
 {
-console.log(elementID);
+// console.log(elementID);
 //element.style.visibility = 'visible';
    document.getElementById(elementID).style.display = "block";
 }
