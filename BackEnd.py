@@ -1,6 +1,6 @@
 import os
 import json
-import urllib.request 
+import urllib.request
 from flask import Flask, request
 from google import google
 from collections import Counter
@@ -8,15 +8,15 @@ import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 import plotly.graph_objects as go
-import re 
+import re
 import tweepy
-from tweepy import OAuthHandler 
+from tweepy import OAuthHandler
 from textblob import TextBlob
-
+from flask_cors import CORS , cross_origin
 
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/search', methods = ['GET','POST'])
 def returnJsonResult():
@@ -25,26 +25,26 @@ def returnJsonResult():
         decodeddata = data.decode('utf-8')
         jsondata =json.loads(decodeddata)
         print(jsondata)
-        
-        
-        # jsondata = {"query":"Lula", 
-        #             "country":[], 
-        #             "lang":[], 
+
+
+        # jsondata = {"query":"Lula",
+        #             "country":[],
+        #             "lang":[],
         #             "verified":"",
         #             "topic":[],
         #             "tweetDateFrom":"",
         #             "tweetDateTo":"",
         #             "exactMatch":"true"}
-        # jsondata = {"query":"modi", 
-        #             "country":["india","usa"], 
-        #             "lang":["en","hi"], 
+        # jsondata = {"query":"modi",
+        #             "country":["india","usa"],
+        #             "lang":["en","hi"],
         #             "verified":"false",
         #             "topic":[],
         #             "tweetDateTo":"2019-08-08T00:00:00Z",
         #             "tweetDateFrom":"2019-09-07T00:00:00Z",
         #             "exactMatch":"false"}
         each_query =  jsondata.get('query')
-        
+
         each_query = each_query.replace(" ", "%20")
         if(each_query == ""):
             each_query = '#"*:*'
@@ -53,13 +53,13 @@ def returnJsonResult():
         # each_query = each_query.replace(":", "\:")
         # each_query = urllib.parse.quote(each_query)
         print(each_query)
-        
+
         input_query = each_query
-        
+
         ip = "18.217.246.4:8984"
         # IRModel = "IRF19P1"
         IRModel = "test"
-        
+
         #country = ["india","usa"]
         country = jsondata.get('country')
         lang = jsondata.get('lang')#["en","hi"]
@@ -68,10 +68,10 @@ def returnJsonResult():
         verified = jsondata.get('verified')
         tweet_date_from = jsondata.get('tweetDateFrom')
         tweet_date_to = jsondata.get('tweetDateTo')
-        
+
         #http://13.59.238.116:8983/solr/IRF19P1/select?q=*%3A*&rows=20
 
-        #topic = []#["news"] 
+        #topic = []#["news"]
         #inputQuery ="*%3A*"
         exact_match = jsondata.get('exactMatch')
         filter_query = ""
@@ -117,7 +117,7 @@ def returnJsonResult():
         for i in range(1, len(topic)):
             filter_query = filter_query + append + topic[i]
             #if(i != len(topic) -1 or verified == "true"):
-             #   fq = fq+append       
+             #   fq = fq+append
 
 
         if(verified == True):
@@ -125,25 +125,25 @@ def returnJsonResult():
                 filter_query = "fq=" + "verified%3Atrue"
              else:
                 filter_query = filter_query + and_append + "verified%3Atrue"
-        
+
         if(verified == False):
              if(filter_query == ""):
                 filter_query = "fq=" + "verified%3Afalse"
              else:
                 filter_query = filter_query + and_append + "verified%3Afalse"
 
-        
+
         #2019-09-07T00:00:00Z TO 2019-09-08T00:00:00Z
         #tweet_date%3A%5B2019-09-07T00%3A00%3A00Z%20TO%202019-09-08T00%3A00%3A00Z%5D%20
         tweet_date_from = jsondata.get('tweetDateFrom')
         tweet_date_to = jsondata.get('tweetDateTo')
-        
+
         if(tweet_date_from != ""):
             tweet_date_from = tweet_date_from + "T00:00:00Z"
-        
+
         if(tweet_date_to != ""):
             tweet_date_to = tweet_date_to + "T00:00:00Z"
-        
+
         if(tweet_date_from != "" and tweet_date_to != ""):
             date_filter = tweet_date_from + " TO " + tweet_date_to
 
@@ -186,7 +186,7 @@ def returnJsonResult():
         #http://18.218.221.88:8984/solr/BM25/select?defType=edismax&q=ARTIKEL&wt=json
         #http://18.218.221.88:8984/solr/BM25/select?defType=edismax&q=Anti-Refugee%20Rally%20in%20Dresden&fl=id%2Cscore&wt=json&indent=true&rows=20
         #http://ec2-18-219-82-180.us-east-2.compute.amazonaws.com:8984/solr/IRF19P1/select?fq=tweet_date%3A%5B2019-09-07T00%3A00%3A00Z%20TO%202019-09-08T00%3A00%3A00Z%5D%20AND%20verified%3Atrue&q=*%3A*
-        #tweet_date:[2019-09-07T00:00:00Z TO 2019-09-08T00:00:00Z] AND verified:true 
+        #tweet_date:[2019-09-07T00:00:00Z TO 2019-09-08T00:00:00Z] AND verified:true
         if(exact_match):
             inurl = 'http://' + ip + '/solr/' + IRModel + '/select?' + filter_query + '&q='+ input_query +'&rows=1000'
             # if(jsondata.get('query') == "isro"):
@@ -236,7 +236,7 @@ def returnJsonResult():
                     topics[tweet_topic] = topics.get(tweet_topic)+1
                 else:
                     topics[tweet_topic] = 1
-                
+
                 country_list.append(docs[i].get("country")[0])
                 hashtags_list.append(docs[i].get("hashtags")[0])
                 mentions_list.append(docs[i].get("mentions")[0])
@@ -385,24 +385,24 @@ def returnJsonResult():
 
 # if __name__ == "__main__":
 #      main()
-        
+
 #http://ec2-18-219-82-180.us-east-2.compute.amazonaws.com:8984/solr/IRF19P1/select?fq=country%3Aindia%20OR%20usa&fq=verified%3Atrue&q=*%3A*
 
 
 
 def clean_tweet(tweet):
-    
+
     return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", tweet).split())
 
-def sentiment_analyse(tweet_text_to_analyse): 
+def sentiment_analyse(tweet_text_to_analyse):
 
-    analysis = TextBlob(clean_tweet(tweet_text_to_analyse)) 
-    
-    if analysis.sentiment.polarity > 0: 
+    analysis = TextBlob(clean_tweet(tweet_text_to_analyse))
+
+    if analysis.sentiment.polarity > 0:
         return 'positive'
-    elif analysis.sentiment.polarity == 0: 
+    elif analysis.sentiment.polarity == 0:
         return 'neutral'
-    else: 
+    else:
         return 'negative'
 
 
@@ -419,10 +419,10 @@ def returnNewsJsonResult():
         data = request.data
         decodeddata = data.decode('utf-8')
         jsondata =json.loads(decodeddata)
-        
+
         each_query =  jsondata.get('query')
-        
-        
+
+
         num_page = 1
         # query = "Modi"
         search_results = google.search(each_query + "news", num_page)
