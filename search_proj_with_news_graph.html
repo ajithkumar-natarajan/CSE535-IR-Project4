@@ -351,14 +351,13 @@
           }
 
         }
-    }
 
     function buildResults(res){
-          //debugger;
+          // debugger;
 
             var row = createElementFromHTML("<hr>");
             var h3 = createElementFromHTML("<h3>"+res['_version_']+"</h3>");
-            var dt = createElementFromHTML("<h5><span class='glyphicon glyphicon-time' ></span> Tweet by "+res['poi_name']+", "+res['tweet_date']+".</h5>");
+            var dt = createElementFromHTML("<h5><span class='glyphicon glyphicon-time' ></span> Tweet by "+res['poi_name']+" on "+res['tweet_date']+".</h5>");
             document.getElementById("results").appendChild(h3);
             document.getElementById("results").appendChild(dt);
             if(typeof res['mentions'] !== 'undefined' && res['mentions'].length > 0){
@@ -404,8 +403,8 @@
       topicsArray = Array.from(topics);
       // debugger;
       for(topic in topicsArray){
-        console.log(topic)
-        document.getElementById("dynamic_topics").appendChild(createElementFromHTML("<li><input type='checkbox' name ='topicChkBox' onchange='topicFilter()'>"+ topicsArray[topic]+"</li>"));
+        // console.log(topic)
+        document.getElementById("dynamic_topics").appendChild(createElementFromHTML("<li><input type='checkbox' name ='topicChkBox' value ='"+ topicsArray[topic] + "' onchange='topicFilter()'>"+ topicsArray[topic]+"</li>"));
       }
 
     }
@@ -413,12 +412,19 @@
     function topicFilter(){
       objJson = [];
       var topicsArray = getCheckedBoxes('topicChkBox');
-      for (obj in masterJson){
-        if(topicsArray.contains(obj['topic'])){
-          objJson.add(obj);
-        }
+      if(topicsArray==null){
+        document.getElementById('submit_qry').click();
       }
+      else{
+        for (var i = 0; i< masterJson.length; i++){
+          // debugger;
+          if(topicsArray.includes(masterJson[i]['topic'][0])){
+            objJson.push(masterJson[i]);
+          }
+        }
       changePage(1);
+      }
+      // debugger;
     }
 
     // Pass the checkbox name to the function
@@ -429,7 +435,9 @@
       for (var i=0; i<checkboxes.length; i++) {
          // And stick the checked ones onto an array...
          if (checkboxes[i].checked) {
-            checkboxesChecked.push(checkboxes[i]);
+            // console.log(checkboxes[i].innerHTML);
+            // console.log(checkboxes[i].value);
+            checkboxesChecked.push(checkboxes[i].value);
          }
       }
       // Return the array if it is non-empty, or null
@@ -629,14 +637,14 @@
 function clearBox(elementID)
 {
     document.getElementById(elementID).style.display = "none";
-	console.log(elementID);
+	// console.log(elementID);
 	//element.style.visibility = 'hidden';      // Hide
      // Show
 }
 
 function displayBox(elementID)
 {
-console.log(elementID);
+// console.log(elementID);
 //element.style.visibility = 'visible';
    document.getElementById(elementID).style.display = "block";
 }
