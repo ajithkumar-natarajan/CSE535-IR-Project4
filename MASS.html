@@ -381,11 +381,11 @@
             document.getElementById("results").appendChild(createElementFromHTML("<p>"+res['tweet_text']+"</p>"));
 
             if(res['sentiment'] === 'positive'){
-              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-up-16.png' alt='POSTIVE' height='16' width='16'></h5>"));
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-up-16.png' alt='POSTIVE' height='32' width='32'></h5>"));
             }else if(res['sentiment'] === 'neutral'){
-              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='so-so-16.png' alt='NEUTRAL' height='16' width='16'></h5>"));
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='so-so-16.png' alt='NEUTRAL' height='32' width='32'></h5>"));
             }else if(res['sentiment'] === 'negative'){
-              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-down-16.png' alt='NEGATIVE' height='16' width='16'></h5>"));
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-down-16.png' alt='NEGATIVE' height='32' width='32'></h5>"));
             }
 
             document.getElementById("results").appendChild(row);
@@ -523,6 +523,8 @@
       clearBox('results2');
       activeTab('1');
 
+      document.getElementById("graphContent").innerHTML = "";
+      document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Location.html" height="550" width="100%"></iframe>'));
       });
 
   document.getElementById("submit_qry_forAnal").addEventListener("click", function() {

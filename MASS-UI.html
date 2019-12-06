@@ -89,11 +89,7 @@
         </li>
         <li class="active"><a>Search by Topic</a>
           <br>
-          <ul>
-            <li><input type="checkbox"  onchange="fireQry()"> checkbox 1</li>
-            <li><input type="checkbox"  onchange="fireQry()"> checkbox 2</li>
-            <li><input type="checkbox"  onchange="fireQry()"> checkbox 3</li>
-            <li><input type="checkbox"  onchange="fireQry()"> checkbox 4</li>
+          <ul id = "dynamic_topics">
           </ul>
           <br>
         </li>
@@ -175,6 +171,9 @@
             <option>Mentions</option>
             <option>Topics</option>
             <option>Sentiments</option>
+            <option>Tweet cloud - USA</option>
+            <option>Tweet cloud - INDIA</option>
+            <option>Tweet cloud - BRAZIL</option>
           </select>
           <div class="graphCont" id="graphContent" style="float:left">
             <iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Location.html" height="550" width="100%"></iframe>
@@ -198,11 +197,12 @@
     var qry = "";
     var countries = [];
     var language = [];
-    var topics = [];
+    let topics = new Set();
     var to_date = "";
     var from_date = "";
     var verified = true;
     var similar  = false;
+    var prevQry = "";
     var jsonData =  {"query":"",
                     "country":[],
                     "lang":[],
@@ -265,23 +265,27 @@
       to_date = "";
       from_date = "";
       if(document.getElementById("us").checked){
-        countries.push("USA");
+        countries.push("usa");
       }
       if(document.getElementById("bra").checked){
-        countries.push("Brazil");
+        countries.push("brazil");
       }
       if(document.getElementById("ind").checked){
-        countries.push("India");
+        countries.push("india");
       }
       if(document.getElementById("eng").checked){
-        language.push("en");
+        language.push("eng");
       }
       if(document.getElementById("por").checked){
-        language.push("pt");
+        language.push("por");
       }
       if(document.getElementById("hi").checked){
         language.push("hi");
       }
+
+
+
+
 
       to_date = document.getElementById('datepicker2').value;
       from_date = document.getElementById('datepicker1').value;
@@ -290,7 +294,13 @@
       jsonData["query"] = qry;
       jsonData["country"] = countries;
       jsonData["lang"] = language;
-      jsonData["topic"] = [];
+     /* if(topicArr != null){
+        jsonData["topic"] =topicArr;
+      }else{
+        jsonData["topic"] = [];
+      }*/
+
+
       jsonData["tweetDateFrom"] = from_date;
       jsonData["tweetDateTo"] = to_date;
 
@@ -327,6 +337,7 @@
 	//End Of SAI
     function acceptResults(res){
       objJson = res;
+      masterJson =objJson;
       const myNode = document.getElementById("results");
         while (myNode.firstChild) {
           myNode.removeChild(myNode.firstChild);
@@ -335,16 +346,19 @@
           document.getElementById("results").appendChild(createElementFromHTML("<h3 style:'color:grey'>No search results found!</h3>"));
           resetPagnation();
         }else{
-          changePage(1);
+            buildTopics(res);
+            changePage(1);
+          }
+
         }
-    }
 
     function buildResults(res){
-          //debugger;
+          // debugger;
 
             var row = createElementFromHTML("<hr>");
-            var h3 = createElementFromHTML("<h3>"+res['_version_']+"</h3>");
-            var dt = createElementFromHTML("<h5><span class='glyphicon glyphicon-time' ></span> Tweet by "+res['poi_name']+", "+res['tweet_date']+".</h5>");
+            var link = 'https://twitter.com/' + res['poi_name'];
+            var h3 = createElementFromHTML("<a href=" + link +" target='_blank'>" + link + "</a>");
+            var dt = createElementFromHTML("<h5><span class='glyphicon glyphicon-time' ></span> Tweet by "+res['poi_name']+" on "+res['tweet_date']+".</h5>");
             document.getElementById("results").appendChild(h3);
             document.getElementById("results").appendChild(dt);
             if(typeof res['mentions'] !== 'undefined' && res['mentions'].length > 0){
@@ -367,16 +381,68 @@
             document.getElementById("results").appendChild(createElementFromHTML("<p>"+res['tweet_text']+"</p>"));
 
             if(res['sentiment'] === 'positive'){
-              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-up-16.png' alt='POSTIVE' height='16' width='16'></h5>"));
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-up-16.png' alt='POSTIVE' height='32' width='32'></h5>"));
             }else if(res['sentiment'] === 'neutral'){
-              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='so-so-16.png' alt='NEUTRAL' height='16' width='16'></h5>"));
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='so-so-16.png' alt='NEUTRAL' height='32' width='32'></h5>"));
             }else if(res['sentiment'] === 'negative'){
-              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-down-16.png' alt='NEGATIVE' height='16' width='16'></h5>"));
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-down-16.png' alt='NEGATIVE' height='32' width='32'></h5>"));
             }
 
             document.getElementById("results").appendChild(row);
 
 
+    }
+
+    function buildTopics(res){
+      topics = new Set();
+      document.getElementById("dynamic_topics").innerHTML = "";
+      // console.log(res[0]["topic"])
+      for(tempres in res){
+        topics.add((res[tempres]["topic"][0]));
+        //topics.add(tempres['topic']);
+      }
+      topicsArray = Array.from(topics);
+      // debugger;
+      for(topic in topicsArray){
+        // console.log(topic)
+        document.getElementById("dynamic_topics").appendChild(createElementFromHTML("<li><input type='checkbox' name ='topicChkBox' value ='"+ topicsArray[topic] + "' onchange='topicFilter()'>"+ topicsArray[topic]+"</li>"));
+      }
+
+    }
+
+    function topicFilter(){
+      objJson = [];
+      var topicsArray = getCheckedBoxes('topicChkBox');
+      if(topicsArray==null){
+        document.getElementById('submit_qry').click();
+      }
+      else{
+        for (var i = 0; i< masterJson.length; i++){
+          // debugger;
+          if(topicsArray.includes(masterJson[i]['topic'][0])){
+            objJson.push(masterJson[i]);
+          }
+        }
+      changePage(1);
+      }
+      // debugger;
+    }
+
+    // Pass the checkbox name to the function
+    function getCheckedBoxes(chkboxName) {
+      var checkboxes = document.getElementsByName(chkboxName);
+      var checkboxesChecked = [];
+      // loop over them all
+      for (var i=0; i<checkboxes.length; i++) {
+         // And stick the checked ones onto an array...
+         if (checkboxes[i].checked) {
+            // console.log(checkboxes[i].innerHTML);
+            // console.log(checkboxes[i].value);
+            checkboxesChecked.push(checkboxes[i].value);
+         }
+      }
+      // Return the array if it is non-empty, or null
+      return checkboxesChecked.length > 0 ? checkboxesChecked : null;
     }
 
     function buildResultsForNews(res){
@@ -404,10 +470,20 @@
 
     function submitPostReq(){
       //const url = 'https://reqres.in/api/users';
-      const url = 'http://127.0.0.1:5000/search';
+      // Uncomment below line to run in local system (Comment below line to in server)
+      // const url = 'http://127.0.0.1:5000/search';
+
+      // Comment below line to run in local system (Uncomment below line to in server)
+      const url = 'http://3.16.56.29:5000/search';
 
 
       // request options
+      // if(prevQry == ""){
+      //   prevQry = jsonData["query"];
+      if( prevQry != jsonData["query"] && prevQry != ''){
+        prevQry = jsonData["query"];
+      }
+
       const options = {
           method: 'POST',
           body: JSON.stringify(jsonData),
@@ -447,6 +523,8 @@
       clearBox('results2');
       activeTab('1');
 
+      document.getElementById("graphContent").innerHTML = "";
+      document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Location.html" height="550" width="100%"></iframe>'));
       });
 
   document.getElementById("submit_qry_forAnal").addEventListener("click", function() {
@@ -491,10 +569,17 @@
         document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Topics.html" height="550" width="100%"></iframe>'));
       }else if(newMetric === 'Sentiments'){
         document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="Sentiments.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Tweet cloud - USA'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="tweet_cloud_USA.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Tweet cloud - INDIA'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="tweet_cloud_India.html" height="550" width="100%"></iframe>'));
+      }else if(newMetric === 'Tweet cloud - BRAZIL'){
+        document.getElementById("graphContent").appendChild(createElementFromHTML('<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="tweet_cloud_Brazil.html" height="550" width="100%"></iframe>'));
       }
     }
 
     var objJson = []; // Can be obtained from another source, such as your objJson variable
+    var masterJson =[];
 
     function prevPage()
     {
@@ -559,14 +644,14 @@
 function clearBox(elementID)
 {
     document.getElementById(elementID).style.display = "none";
-	console.log(elementID);
+	// console.log(elementID);
 	//element.style.visibility = 'hidden';      // Hide
      // Show
 }
 
 function displayBox(elementID)
 {
-console.log(elementID);
+// console.log(elementID);
 //element.style.visibility = 'visible';
    document.getElementById(elementID).style.display = "block";
 }
@@ -587,7 +672,12 @@ $(document).keyup(function(event) {
 
 function submitPostReqForNews(){
       //const url = 'https://reqres.in/api/users';
-      const url = 'http://127.0.0.1:5000/news';
+
+      // Uncomment below line to run in local system (Comment below line to in server)
+      // const url = 'http://127.0.0.1:5000/news';
+
+      // Comment below line to run in local system (Uncomment below line to in server)
+      const url = 'http://3.16.56.29:5000/news';
 
 
       // request options
