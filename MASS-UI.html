@@ -96,8 +96,8 @@
         <li class="active"><a href="#section1">Filter by Date</a>
           <br>
           <ul>
-            <li>From date:</br><input type="text"  onchange="fireQry()" id="datepicker1"></li>
-            <li>To date:</br><input type="text"  onchange="fireQry()" id="datepicker2"></li>
+            <li>From date:</br><input type="text" style="width: 150px"  onchange="fireQry()" id="datepicker1"></li>
+            <li>To date:</br><input type="text" style="width: 150px"  onchange="fireQry()" id="datepicker2"></li>
           </ul>
           <br>
         </li>
@@ -265,19 +265,19 @@
       to_date = "";
       from_date = "";
       if(document.getElementById("us").checked){
-        countries.push("usa");
+        countries.push("USA");
       }
       if(document.getElementById("bra").checked){
-        countries.push("brazil");
+        countries.push("Brazil");
       }
       if(document.getElementById("ind").checked){
-        countries.push("india");
+        countries.push("India");
       }
       if(document.getElementById("eng").checked){
-        language.push("eng");
+        language.push("en");
       }
       if(document.getElementById("por").checked){
-        language.push("por");
+        language.push("pt");
       }
       if(document.getElementById("hi").checked){
         language.push("hi");
@@ -381,11 +381,11 @@
             document.getElementById("results").appendChild(createElementFromHTML("<p>"+res['tweet_text']+"</p>"));
 
             if(res['sentiment'] === 'positive'){
-              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-up-16.png' alt='POSTIVE' height='32' width='32'></h5>"));
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-up-16.png' alt='POSTIVE' height='20' width='20'></h5>"));
             }else if(res['sentiment'] === 'neutral'){
-              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='so-so-16.png' alt='NEUTRAL' height='32' width='32'></h5>"));
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='so-so-16.png' alt='NEUTRAL' height='20' width='20'></h5>"));
             }else if(res['sentiment'] === 'negative'){
-              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-down-16.png' alt='NEGATIVE' height='32' width='32'></h5>"));
+              document.getElementById("results").appendChild(createElementFromHTML("<h5>Sentiment Analysis : <img src='thumbs-down-16.png' alt='NEGATIVE' height='20' width='20'></h5>"));
             }
 
             document.getElementById("results").appendChild(row);
