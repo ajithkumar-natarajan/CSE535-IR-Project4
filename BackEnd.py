@@ -12,10 +12,11 @@ import re
 import tweepy
 from tweepy import OAuthHandler 
 from textblob import TextBlob
-
+from flask_cors import CORS, cross_origin
 
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/search', methods = ['GET','POST'])
@@ -56,7 +57,7 @@ def returnJsonResult():
         
         input_query = each_query
         
-        ip = "18.217.246.4:8984"
+        ip = "18.191.55.237:8984"
         # IRModel = "IRF19P1"
         IRModel = "test"
         
@@ -441,5 +442,8 @@ def returnNewsJsonResult():
 
 if __name__ == "__main__":
     # print("In program")
+    #Uncomment below line to run in local system (Comment below line to in server)
     app.run()
+    #Comment below line to run in local system (Uncomment below line to in server)
+    app.run(host= '0.0.0.0')
     # returnNewsJsonResult()
